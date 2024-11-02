@@ -13,9 +13,9 @@ Header-ul UDP-ului este format din 8 octeți:
 -  **Lungimea** (2 octeți) - incluzând atât header-ul, cât și datele;
 -  **Checksum** (2 octeți) - nu este obligatorie la protocolul UDP.
 
-<p style="text-align:center">
-<img src="https://hackmd.io/_uploads/HJbVDW4WJx.png" style="position:absolute; transform:translate(50%)">
-</p>
+<div align="center">
+	<img src=https://hackmd.io/_uploads/HJbVDW4WJx.png>
+</div>
 
 **Avantaje:**
 - viteză și eficiență;
