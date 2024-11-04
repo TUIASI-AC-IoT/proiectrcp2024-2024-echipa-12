@@ -34,6 +34,24 @@ Header-ul UDP-ului este format din 8 octeți:
 ### • Fereastra Glisanta
 
 
+### ⮚ Structura Pachetelor
+Pachetul este unitatea de bază a transferului de informație.
+La primirea tuturor pachetelor, destinatarul va reuni pachetele sub forma intițială mesajul.
+
+```
+                                       +-----------+                      +------------------------+
+                                       |   DATA    |                      | Aplication Presentation|
+                                       +-----------+                      |                        |
+                          +-----------++-----------+                      |                        |
+                          |UDP HEADER || UDP DATA  |                      |   Session Transport    |
+                          +-----------++-----------+                      |                        |
+             +-----------++-----------++-----------+                      |                        |
+             |IP HEADER  ||       IP DATA          |                      |        Network         |
+             +-----------++-----------++-----------+                      |                        |
++-----------++-----------++-----------++-----------++------------+        |                        |
+|FRAME HEADE||              FRAME DATA             ||    FCS     |        |   Data Link Physical   |
++-----------++-----------++-----------++-----------++------------+        +------------------------+
+```
 
 
 ### • Bibliografie
