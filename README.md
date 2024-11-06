@@ -1,5 +1,5 @@
 # Controlul fluxului prin intermediul unui protocol cu fereastră glisantă.
-
+## Prezentare noțiuni teoretice
 ### • Protocolul UDP (User Datagram Protocol)
 UDP este un protocol de comunicare utilizat pentru aplicațiile time-sensitive.
 
@@ -52,36 +52,44 @@ Dacă dispozitivul care transmite date este rapid/mai puțin încărcat, iar dis
 ```
 **Selective Repeat ARQ**
 Este un mecanism de tratare a erorilor în care, receptorul acceptă și pune in buffer pachetul de după unul pierdut/care are eroare. Selective repeat încearcă retransmisia doar a pachetelor pierdute.
+	
+
+
 <div align="center">
-<img src=https://hackmd.io/_uploads/rJjqCh8Zkg.jpg>
+<img src=https://hackmd.io/_uploads/SknK17KW1x.png>
 <br>
 	<sup>Modalitate de funcționare selective repeat.</sup>
 </div>
 
-
 ## Detalii de implementare
+
 
 ### ⮚ Structura Pachetelor
 Pachetul este unitatea de bază a transferului de informație.
-La primirea tuturor pachetelor, destinatarul va reuni pachetele sub forma intițială mesajul.
+
 
 ```
-                                       +-----------+                      +------------------------+
-                                       |   DATA    |                      | Aplication Presentation|
-                                       +-----------+                      |                        |
-                          +-----------++-----------+                      |                        |
-                          |UDP HEADER || UDP DATA  |                      |   Session Transport    |
-                          +-----------++-----------+                      |                        |
-             +-----------++-----------++-----------+                      |                        |
-             |IP HEADER  ||       IP DATA          |                      |        Network         |
-             +-----------++-----------++-----------+                      |                        |
-+-----------++-----------++-----------++-----------++------------+        |                        |
-|FRAME HEADE||              FRAME DATA             ||    FCS     |        |   Data Link Physical   |
-+-----------++-----------++-----------++-----------++------------+        +------------------------+
+                                        +-----------+                   +------------------------+
+                                        |   DATA    |                   | Aplication Presentation|
+                                        +-----------+                   |                        |
+                           +-----------++-----------+                   |                        |
+                           |UDP HEADER || UDP DATA  |                   |   Session Transport    |
+                           +-----------++-----------+                   |                        |
+              +-----------++-----------++-----------+                   |                        |
+              | IP HEADER ||        IP DATA         |                   |        Network         |
+              +-----------++-----------++-----------+                   |                        |
++------------++-----------++-----------++-----------++------------+     |                        |
+|FRAME HEADER||              FRAME DATA             ||    FCS     |     |   Data Link Physical   |
++------------++-----------++-----------++-----------++------------+     +------------------------+
 ```
 
 
-### • Bibliografie
+
+### ⮚ Bibliografie
 * https://www.geeksforgeeks.org/user-datagram-protocol-udp/
 * https://www.fortinet.com/resources/cyberglossary/user-datagram-protocol-udp
 * https://pcom.pages.upb.ro/notite-cb/curs7/curs.html
+* https://nlp.unibuc.ro/courses/RdC.pdf
+* https://www.techtarget.com/whatis/definition/flow-control
+* https://www.liveaction.com/resources/blog-post/what-is-a-network-packet/
+* https://www.youtube.com/watch?app=desktop&v=WfIhQ3o2xow
