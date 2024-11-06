@@ -83,7 +83,19 @@ Pachetul este unitatea de bază a transferului de informație.
 +------------++-----------++-----------++-----------++------------+     +------------------------+
 ```
 
-
+> Structura detaliată a segmentului de date a pachetului 
+```
++---------------------------------------------------------------------+
+|                               DATA                                  |
++-----------+----------------+----------------------------------------+    
+| TYPE FLAG |  FRAME NUMBER  |                  DATA                  |
++-----------+----------------+----------------------------------------+
+\          /\               /\                                       /
+  1 octet       4 octeți              număr variabil de octeți
+```
+### Thread-uri
+- Server : 3 thread-uri(1 send, 1 receive, 1 prelucrare);
+- Client : 4 thread-uri(1 user interface, 1 send, 1 receive, 1 prelucrare).
 
 ### ⮚ Bibliografie
 * https://www.geeksforgeeks.org/user-datagram-protocol-udp/
