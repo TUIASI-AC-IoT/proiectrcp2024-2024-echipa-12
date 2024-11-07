@@ -96,6 +96,10 @@ Pachetul este unitatea de bază a transferului de informație.
 ### Thread-uri
 - Server : 3 thread-uri(1 send, 1 receive, 1 prelucrare);
 - Client : 4 thread-uri(1 user interface, 1 send, 1 receive, 1 prelucrare).
+  
+![image](https://hackmd.io/_uploads/rkMipIqZyg.png)
+
+
 
 ### ⮚ Bibliografie
 * https://www.geeksforgeeks.org/user-datagram-protocol-udp/
