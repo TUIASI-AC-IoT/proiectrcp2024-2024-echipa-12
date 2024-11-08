@@ -56,7 +56,7 @@ Este un mecanism de tratare a erorilor în care, receptorul acceptă și pune in
 
 
 <div align="center">
-<img src=https://hackmd.io/_uploads/SknK17KW1x.png>
+<img height=600px src=https://hackmd.io/_uploads/SkfwZrjW1g.png>
 <br>
 	<sup>Modalitate de funcționare selective repeat.</sup>
 </div>
