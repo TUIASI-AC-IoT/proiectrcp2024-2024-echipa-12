@@ -1,3 +1,5 @@
+import os
+
 #package types
 ACK = 0b0000_0001
 FILE_CHUNK = 0b0000_0010
@@ -12,3 +14,7 @@ CD       = 0b0000_0010
 MKDIR = 0b0000_0011
 RM_RMDIR = 0b0000_0100
 MOVE     = 0b0000_0101
+TOUCH     = 0b0000_0110
+
+path = os.getcwd() + "\\"
+ROOT = os.getcwd() + "\\"

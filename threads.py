@@ -2,6 +2,7 @@ import socket as sc
 import threading as Thread
 from time import sleep
 
+from openpyxl.styles.builtins import comma
 from pyexpat.errors import messages
 
 import encoder
@@ -18,10 +19,20 @@ def send_packet(udp_ip,udp_port,scket):
         new_message_event.wait()
         with lock:
             if(global_client_message!=""):
-                mess = encoder.packing(util.FILE_CHUNK, frame_number, 0, global_client_message)
+                msg = global_client_message.split("@")
+                if(msg[0] == "ls"):
+                    mess = encoder.packing(util.COMMAND_NO_PARAMS, 0, util.LS)
+                elif(msg[0] == "cd"):
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.CD, msg[1])
+                elif(msg[0] == "rmdir"):
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0,command_id=util.RM_RMDIR, data=msg[1])
+                elif(msg[0] == "mkdir"):
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0,command_id=util.MKDIR, data=msg[1])
+                print("sending message...")
                 scket.sendto(mess, (udp_ip, udp_port))
-                frame_number+=1
-        sleep(3)
+                global_client_message = ''
+                #frame_number+=1
+
 
 def make_message():
     global global_client_message
@@ -37,13 +48,17 @@ def make_message():
             if (val == "1"):
                 global_client_message = "ls"
             elif (val == "2"):
-                global_client_message = "cd"
+                args = input("introduceti nume folder sau .. pt back: ")
+                global_client_message = "cd@"+args
             elif (val == "3"):
-                global_client_message = "mkdir"
+                args = input("introduceti nume folder: ")
+                global_client_message = "mkdir@"+args
             elif (val == "4"):
-                global_client_message= "rmdir"
+                args = input("introduceti nume folder: ")
+                global_client_message= "rmdir@" + args
             elif (val == "5"):
-                global_client_message = "move"
+                args = input("introduceti nume folder + locatia (teoretic functional dar ar trebui lucrat sa mearga pt ui): ")
+                global_client_message = "move@"+args
             else:
                 global_client_message = ""
                 print("invalid input")
