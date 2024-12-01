@@ -25,7 +25,7 @@ def unpack(packet: bytes):
                 os.system(f'cd {data}')
                 util.path = util.path + data + "\\"
             elif data == ".." and util.path != util.ROOT:
-                util.path = os.path.dirname(util.path.removesuffix('\\')) + "\\"
+                util.path = os.path.dirname(util.path.removesuffix('\\')) + "\\\""
         elif cmd_id == util.MKDIR:
             os.system(f'mkdir {data}')
         elif cmd_id == util.RM_RMDIR:
@@ -35,14 +35,14 @@ def unpack(packet: bytes):
                 os.remove(util.path + data)
         elif cmd_id == util.MOVE:
             data.split(' ')
-            os.system(f'move {util.path + data[0]} {util.ROOT + data[1]}')
+            os.system(f'move f"\"{util.path + data[0]}\"" f"\"{util.ROOT + data[1]}\""')
         elif cmd_id == util.TOUCH:
             with open(util.path + data, 'w') as file:
                 pass
     elif type_flag == util.COMMAND_NO_PARAMS:
         #print(cmd_id)
         if cmd_id == util.LS:
-            output = os.system(f'DIR /B ' + util.path)
+            output = os.system(f'DIR /B ' + f"\"{util.path}\"")
             print(output)
 
 
