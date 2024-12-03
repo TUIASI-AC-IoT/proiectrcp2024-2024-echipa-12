@@ -1,5 +1,11 @@
 import os
 
+server_ip = '127.0.0.1'
+server_port = '25565'
+
+client_ip = '127.0.0.1'
+client_port = 25565
+
 #package types
 ACK = 0b0000_0001
 FILE_CHUNK = 0b0000_0010

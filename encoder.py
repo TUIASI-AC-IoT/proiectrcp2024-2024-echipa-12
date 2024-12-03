@@ -1,6 +1,5 @@
-from _ctypes import sizeof
 import struct
-import util
+
 def packing(flag, frame_number=0b0000_0000, command_id=0b0000_0000, data=None):
     if(data==None):
         data_to_pack=struct.pack('!BhB', flag, frame_number, command_id)
