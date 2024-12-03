@@ -1,9 +1,9 @@
 import os
 
-server_ip = "127.0.0.1"
+server_ip = "192.168.1.97"
 server_port = 25565
 
-client_ip = "127.0.0.1"
+client_ip = "192.168.1.134"
 client_port = 25565
 
 #package types

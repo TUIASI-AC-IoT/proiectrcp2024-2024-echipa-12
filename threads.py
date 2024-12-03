@@ -68,7 +68,7 @@ def make_message(q):
         new_message_event.set()
         sleep(3)
 
-def receive_packet(q, udp_ip, udp_port, scket):
-    while (True ):
-        pct = scket.recvfrom(1024)
+def receive_packet(q, udp_ip, udp_port, scket:sc.socket):
+    while True:
+        pct, addr = scket.recvfrom(1024)
         unpack(pct, None, scket, (udp_ip, udp_port))
