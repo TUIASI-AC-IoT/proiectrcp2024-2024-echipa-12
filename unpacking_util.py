@@ -37,7 +37,7 @@ def unpack(packet: bytes, sent:list[Packet], sock:socket.socket, address:tuple[s
             elif data == ".." and util.path != util.ROOT:
                 util.path = os.path.dirname(util.path.removesuffix('\\')) + "\\\""
         elif cmd_id == util.MKDIR:
-            os.system(f'mkdir {data}')
+            os.system(f'mkdir {util.path + data}')
         elif cmd_id == util.RM_RMDIR:
             if os.path.isdir(util.path + data):
                 os.removedirs(util.path + data)
@@ -49,11 +49,11 @@ def unpack(packet: bytes, sent:list[Packet], sock:socket.socket, address:tuple[s
         elif cmd_id == util.TOUCH:
             with open(util.path + data, 'w') as file:
                 pass
-        sock.sendto(packing(util.ACK, 0, cmd_id, 0), address)
+        sock.sendto(packing(util.ACK, 0, cmd_id, None), address)
     elif type_flag == util.COMMAND_NO_PARAMS:
         #print(cmd_id)
         if cmd_id == util.LS:
-            command = f'DIR /B "{util.path}"'
+            command = f'DIR /B {util.path}'
             result = subprocess.run(command, shell=True, text=True, capture_output=True)
             output = result.stdout
             #os.system(f'DIR /B ' + f"\"{util.path}\"")

@@ -1,10 +1,10 @@
 import os
 
-server_ip = "192.168.1.97"
+server_ip = "localhost"
 server_port = 25565
 
-client_ip = "192.168.1.134"
-client_port = 25565
+client_ip = "localhost"
+client_port = 25566
 
 #package types
 ACK = 0b0000_0001
@@ -22,5 +22,5 @@ RM_RMDIR = 0b0000_0100
 MOVE     = 0b0000_0101
 TOUCH     = 0b0000_0110
 
-path = os.getcwd() + "\\"
-ROOT = os.getcwd() + "\\"
+path = os.getcwd() + "\\SERVER_FILES\\"
+ROOT = os.getcwd() + "\\SERVER_FILES\\"
