@@ -2,12 +2,10 @@ import socket as sc
 import threading as Thread
 from time import sleep
 from unpacking_util import unpack
-from pyexpat.errors import messages
 
 import encoder
 import util
 
-#global_client_message=""
 lock = Thread.Lock()
 new_message_event = Thread.Event()
 

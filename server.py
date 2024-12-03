@@ -2,6 +2,8 @@ import socket as sc
 import threading
 import queue
 import unpacking_util as up
+import util
+
 
 def send():#q, s, socket, address):
     pass
@@ -14,14 +16,8 @@ def rcv(q, s, socket, address):
         print("de la:", addr)
 
 
-UDP_IP = "127.0.0.1"
-UDP_PORT = 5005
-
-clip = "127.0.0.1"
-clport = 5005
-
 socket = sc.socket(sc.AF_INET, sc.SOCK_DGRAM)
-socket.bind((UDP_IP, UDP_PORT))
+socket.bind((util.server_ip, util.server_port))
 
 print("SERVER STARTED!")
 
@@ -29,7 +25,7 @@ q = queue.Queue()
 sent = queue.Queue()
 
 sender = threading.Thread(target=send, args=())#q, sent, socket, (UDP_IP, clport)))
-receiver = threading.Thread(target=rcv, args=(q, sent, socket, (UDP_IP, clport)))
+receiver = threading.Thread(target=rcv, args=(q, sent, socket, (util.client_ip, util.client_port)))
 sender.start()
 receiver.start()
 sender.join()
