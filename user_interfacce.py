@@ -1,32 +1,28 @@
+import time
 import tkinter as tk
-from importlib.metadata import files
-from queue import Empty
-from tkinter import filedialog
 from util import uiupdateQ, actionQ
-from tkinter import PhotoImage
-from PIL import Image, ImageTk
 import customtkinter as ctk
 
 def ui():
-    def updateUI(folder_icon, file_icon):
+    def updateUI(folder_icon, file_icon,delete_item_icon):
         for widget in fileframe.winfo_children():
             widget.destroy()
         actionQ.put('ls')
         btn = ctk.CTkButton(
             fileframe,
             text="..",
-            width=1200,
+            width=600,
             height=10,
             fg_color='#191919',
             image=folder_icon,
-            command=lambda filename="..": (actionQ.put(f"cd@{filename}"), updateUI(folder_icon, file_icon)),  # filename)),
+            command=lambda filename="..": (actionQ.put(f"cd@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon)),# filename)),
             font=("Arial", 18),
             compound=ctk.LEFT,
             anchor="w",
             hover_color="#505050",
             corner_radius=0,
         )
-        btn.pack()
+        btn.grid(row=1,column=0)
         data = None
         while uiupdateQ.qsize() != 0:
             data = uiupdateQ.get()
@@ -41,15 +37,17 @@ def ui():
                         files.append(i.split('File: ')[1])
                     else:
                         folders.append(i.split('Folder: ')[1])
+            j=1
             for i in folders:
+                j=j+1
                 btn = ctk.CTkButton(
                     fileframe,
                     text=i,
-                    width=1200,
+                    width=600,
                     height=10,
                     fg_color='#191919',
                     image=folder_icon,
-                    command=lambda filename=i: (actionQ.put(f"cd@{filename}"), updateUI(folder_icon, file_icon)),#filename)),
+                    command=lambda filename=i: (actionQ.put(f"cd@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon)),#filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
                     anchor="w",
@@ -58,12 +56,33 @@ def ui():
                     # border_width=1,
                     # border_color='white',
                 )
-                btn.pack()
+                btn.grid(row=j,column=0)
+                #buton pentru stergere fisier
+                delete_btn = ctk.CTkButton(
+                    fileframe,
+                    text="",
+                    width=32,
+                    height=32,
+                    image=delete_item_icon,
+                    fg_color='#191919',
+                    command=lambda filename=i: (actionQ.put(f"rmdir@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon)),
+                    # filename)),
+                    font=("Arial", 18),
+                    compound=ctk.LEFT,
+                    anchor="w",
+                    hover_color="#505050",
+                    corner_radius=0,
+                    # border_width=1,
+                    # border_color='white',
+                )
+                delete_btn.grid(row=j, column=1)
+                #======================================
             for i in files:
+                j=j+1
                 btn = ctk.CTkButton(
                     fileframe,
                     text=i,
-                    width=1200,
+                    width=600,
                     height=10,
                     fg_color='#191919',
                     image=file_icon,
@@ -76,7 +95,26 @@ def ui():
                     # border_width=1,
                     # border_color='white',
                 )
-                btn.pack()
+                btn.grid(row=j, column=0)
+                #buton pentru stergere fisier
+                delete_btn = ctk.CTkButton(
+                    fileframe,
+                    text="",
+                    width=32,
+                    height=32,
+                    fg_color='#191919',
+                    image=delete_item_icon,
+                    command=lambda filename=i: (actionQ.put(f"rm@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon)),
+                    # filename)),
+                    font=("Arial", 18),
+                    compound=ctk.LEFT,
+                    anchor="w",
+                    hover_color="#505050",
+                    corner_radius=0,
+                    # border_width=1,
+                    # border_color='white',
+                )
+                delete_btn.grid(row=j, column=1)
 
     root = ctk.CTk(fg_color="#191919")
     root.title("Controlul Fluxului Prin Fereastra Glisanta - Lefter Andrei, Georgiana Stefania Zaharia =^._.^=")
@@ -94,7 +132,7 @@ def ui():
 
     folder_icon = tk.PhotoImage(file='folders2.png')
     file_icon = tk.PhotoImage(file='files.png')#https://www.pngwing.com/en/free-png-mflca
-
-    updateUI(folder_icon, file_icon)
+    delete_item_icon=tk.PhotoImage(file='delete_icon.png')
+    updateUI(folder_icon, file_icon,delete_item_icon)
 
     root.mainloop()
