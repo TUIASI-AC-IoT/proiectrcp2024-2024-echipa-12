@@ -1,9 +1,9 @@
 import os
-
-server_ip = "localhost"
+import queue
+server_ip = "127.0.0.1"
 server_port = 25565
 
-client_ip = "localhost"
+client_ip = "127.0.0.1"
 client_port = 25566
 
 #package types
@@ -24,3 +24,8 @@ TOUCH     = 0b0000_0110
 
 path = os.getcwd() + "\\SERVER_FILES\\"
 ROOT = os.getcwd() + "\\SERVER_FILES\\"
+
+actionQ = queue.Queue()
+ackQ = queue.Queue()
+filechunkQ = queue.Queue()
+uiupdateQ = queue.Queue()

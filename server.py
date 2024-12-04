@@ -8,10 +8,10 @@ import util
 def send():#q, s, socket, address):
     pass
 
-def rcv(q, s, socket, address):
+def rcv(q, s, sock, address):
     while True:
-        data, addr = socket.recvfrom(1024)
-        up.unpack(data, None, socket, address)
+        data, addr = sock.recvfrom(1024)
+        a = up.unpack(data, sock, address)
         print("AM PRIMIT UN MESAJ %s: " % data)
         print("de la:", addr)
 
