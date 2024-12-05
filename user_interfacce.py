@@ -61,7 +61,7 @@ def ui():
                 delete_btn = ctk.CTkButton(
                     fileframe,
                     text="",
-                    width=32,
+                    width=30,
                     height=32,
                     image=delete_item_icon,
                     fg_color='#191919',
@@ -100,7 +100,7 @@ def ui():
                 delete_btn = ctk.CTkButton(
                     fileframe,
                     text="",
-                    width=32,
+                    width=30,
                     height=32,
                     fg_color='#191919',
                     image=delete_item_icon,
@@ -115,6 +115,38 @@ def ui():
                     # border_color='white',
                 )
                 delete_btn.grid(row=j, column=1)
+
+            #=====casuta text
+            textbox = ctk.CTkTextbox(fileframe, width=300, height=32, font=("Arial", 18))
+            textbox.grid(row=j+1, column=5)
+            textbox.insert("0.0", "new")
+            new_file_name = textbox.get("0.0", "end").strip()  # get text from line 0 character 0 till the end
+            textbox.delete("0.0", "end")  # delete all text
+            #========
+            #buton creare fisier
+            btn_new_file = ctk.CTkButton(
+                fileframe,
+                text="New Folder:",
+                width=30,
+                height=32,
+                fg_color='#191919',
+                image="",
+                command=lambda filename=i: (
+                actionQ.put(f"mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon)),
+                # filename)),
+                font=("Arial", 18),
+                compound=ctk.LEFT,
+                anchor="w",
+                hover_color="#505050",
+                corner_radius=0,
+                border_width=1,
+                border_color='white',
+            )
+            btn_new_file .grid(row=j+1, column=1)
+            #===============
+    def get_text(textbox) -> str:
+        text=textbox.get("0.0", "end")
+        return text
 
     root = ctk.CTk(fg_color="#191919")
     root.title("Controlul Fluxului Prin Fereastra Glisanta - Lefter Andrei, Georgiana Stefania Zaharia =^._.^=")
