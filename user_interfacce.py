@@ -24,9 +24,11 @@ def ui():
         )
         btn.grid(row=1,column=0)
         data = None
-        while uiupdateQ.qsize() != 0:
-            data = uiupdateQ.get()
+
+        print("aici iau din q:", time.time() * 100 % 10000)
+        data = uiupdateQ.get()
         print(data)
+        print("aici e ce e in q:", data , "\n", time.time() * 100 % 10000)
         if data is not None:
             data = data.split('\n')
             files = []
@@ -116,34 +118,8 @@ def ui():
                 )
                 delete_btn.grid(row=j, column=1)
 
-            #=====casuta text
-            textbox = ctk.CTkTextbox(fileframe, width=300, height=32, font=("Arial", 18))
-            textbox.grid(row=j+1, column=5)
-            textbox.insert("0.0", "new")
-            new_file_name = textbox.get("0.0", "end").strip()  # get text from line 0 character 0 till the end
-            textbox.delete("0.0", "end")  # delete all text
-            #========
-            #buton creare fisier
-            btn_new_file = ctk.CTkButton(
-                fileframe,
-                text="New Folder:",
-                width=30,
-                height=32,
-                fg_color='#191919',
-                image="",
-                command=lambda filename=i: (
-                actionQ.put(f"mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon)),
-                # filename)),
-                font=("Arial", 18),
-                compound=ctk.LEFT,
-                anchor="w",
-                hover_color="#505050",
-                corner_radius=0,
-                border_width=1,
-                border_color='white',
-            )
-            btn_new_file .grid(row=j+1, column=1)
-            #===============
+
+
     def get_text(textbox) -> str:
         text=textbox.get("0.0", "end")
         return text
@@ -159,12 +135,39 @@ def ui():
     root.wm_iconbitmap() #n am idee de ce nu se schimba iconita daca nu e asta sincer
     root.iconphoto(False, icon)
 
-    fileframe = ctk.CTkScrollableFrame(root, width=1200, height=450, corner_radius=0, fg_color='#191919')
+    fileframe = ctk.CTkScrollableFrame(root, width=1200, height=450, corner_radius=0, fg_color='#191919', border_width=2, border_color='#555555')
     fileframe.place(x=34, y=20)
+    # =====casuta text
+    textbox = ctk.CTkTextbox(root, width=300, height=32, font=("Arial", 18))
+    textbox.place(x=150, y=500)
+    textbox.insert("0.0", "new")
+    new_file_name = textbox.get("0.0", "end").strip()
+    textbox.delete("0.0", "end")
+    # ========
+    # buton creare fisier
+    btn_new_file = ctk.CTkButton(
+        root,
+        text="New Folder:",
+        width=30,
+        height=32,
+        fg_color='#191919',
+        image="",
+        command=lambda: (actionQ.put(f"mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon)),
+        # filename)),
+        font=("Arial", 18),
+        compound=ctk.LEFT,
+        anchor="w",
+        hover_color="#505050",
+        corner_radius=0,
+        border_width=1,
+        border_color='white',
+    )
+    btn_new_file.place(x=30, y=500)
+    # ===============
 
     folder_icon = tk.PhotoImage(file='folders2.png')
     file_icon = tk.PhotoImage(file='files.png')#https://www.pngwing.com/en/free-png-mflca
-    delete_item_icon=tk.PhotoImage(file='delete_icon.png')
+    delete_item_icon=tk.PhotoImage(file='remove.png')
     updateUI(folder_icon, file_icon,delete_item_icon)
 
     root.mainloop()

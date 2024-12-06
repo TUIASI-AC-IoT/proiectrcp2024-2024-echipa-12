@@ -12,8 +12,8 @@ def rcv(q, s, sock, address):
     while True:
         data, addr = sock.recvfrom(1024)
         a = up.unpack(data, sock, address)
-        print("AM PRIMIT UN MESAJ %s: " % data)
-        print("de la:", addr)
+        #print("AM PRIMIT UN MESAJ %s: " % data)
+        #print("de la:", addr)
 
 
 socket = sc.socket(sc.AF_INET, sc.SOCK_DGRAM)

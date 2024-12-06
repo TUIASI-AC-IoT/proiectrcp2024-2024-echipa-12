@@ -8,6 +8,3 @@ def packing(flag, frame_number=0b0000_0000, command_id=0b0000_0000, data=None):
         format_str = f'!BhB{len(data_bytes)}s'
         data_to_pack = struct.pack(format_str, flag, frame_number, command_id, data_bytes)
     return data_to_pack
-
-
-

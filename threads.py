@@ -13,19 +13,19 @@ new_message_event = Thread.Event()
 def send_packet(udp_ip, udp_port, scket):
     #frame_number=0
 
-    scket.sendto(encoder.packing(util.COMMAND_NO_PARAMS, 0, util.LS), (udp_ip, udp_port))
-    print("a fost primu ls")
+    #scket.sendto(encoder.packing(util.COMMAND_NO_PARAMS, 0, util.LS), (udp_ip, udp_port))
+    #print("a fost primu ls")
     while (True ):
         message = ""
         #new_message_event.wait()
         #print(actionQ.get())
         if not util.actionQ.qsize()!=0:
             message = util.actionQ.get()
-            print(message)
+            #print(message)
         with lock:
             if(message!=""):
                 msg=message.split("@")
-                print('mesaj', msg)
+                #print('mesaj', msg)
                 if(msg[0] == "ls"):
                     #print(util.path)
                     mess = encoder.packing(util.COMMAND_NO_PARAMS, 0, util.LS)
@@ -38,7 +38,7 @@ def send_packet(udp_ip, udp_port, scket):
                 elif(msg[0] == "mkdir"):
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0,command_id=util.MKDIR, data=msg[1])
                 print("sending message...")
-                print("am trimis mesajul", mess)
+                print("am trimis mesajul", mess, " ", time.time()*100%10000)
                 scket.sendto(mess, (udp_ip, udp_port))
                 message = ""
                 #frame_number+=1

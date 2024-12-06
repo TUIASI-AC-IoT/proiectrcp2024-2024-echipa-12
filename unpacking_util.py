@@ -11,16 +11,16 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     cmd_id = struct.unpack('!c', packet[3:4])[0][0]
     if type_flag == util.ACK:
         data = None
-        print("AM PRIMIT ACK")
+        #print("AM PRIMIT ACK")
 
     elif type_flag == util.ACK_COMMAND:
         data = None
-        print("AM PRIMIT ACK CMD!")
+        #print("AM PRIMIT ACK CMD!")
 
     elif type_flag == util.ACK_COMMAND_W_OUTPUT:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
         uiupdateQ.put(data)
-        #print("AM PRIMIT ACK CMD ", data)
+        print("AM PRIMIT ACK CMD:\n", data ,"\ntimestamp ", time.time()*100%10000)
 
     elif type_flag == util.FILE_CHUNK:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])
@@ -32,7 +32,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         if cmd_id == util.CD:
             if data != "..":
                 util.path = util.path + data + "\\"
-                print(util.path)
+                print("path: ", util.path)
             elif data == ".." and util.path != util.ROOT:
                 util.path = util.path.rstrip("\\")
                 util.path = os.path.dirname(util.path) + "\\"
@@ -63,9 +63,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
 
             #combinam totul
             output = folder_result.stdout + file_result.stdout
-
-            print("primit comanda, dau ack")
-            print('out', output , "pth", util.path)
+            print("ls primit\n", output,  "\ntimestamp: ", time.time()*100%10000)
             sock.sendto(packing(util.ACK_COMMAND_W_OUTPUT, 0, cmd_id, output), address)
             #trimite ACK pt comanda cu output
     return None
