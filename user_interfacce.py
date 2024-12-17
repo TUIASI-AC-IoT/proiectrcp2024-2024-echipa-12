@@ -4,7 +4,7 @@ from util import uiupdateQ, actionQ
 import customtkinter as ctk
 
 def ui():
-    def updateUI(folder_icon, file_icon,delete_item_icon):
+    def updateUI(folder_icon, file_icon,delete_item_icon,download_icon):
         for widget in fileframe.winfo_children():
             widget.destroy()
         actionQ.put('ls')
@@ -117,6 +117,24 @@ def ui():
                     # border_color='white',
                 )
                 delete_btn.grid(row=j, column=1)
+                download_btn = ctk.CTkButton(
+                    fileframe,
+                    text="Download",
+                    width=30,
+                    height=32,
+                    fg_color='#191919',
+                    image=download_icon,
+                    #command=lambda filename=i: (),
+                    # filename)),
+                    font=("Arial", 18),
+                    compound=ctk.LEFT,
+                    anchor="w",
+                    hover_color="#505050",
+                    corner_radius=0,
+                    # border_width=1,
+                    # border_color='white',
+                )
+                download_btn.grid(row=j, column=2)
 
 
 
@@ -127,7 +145,7 @@ def ui():
     root = ctk.CTk(fg_color="#191919")
     root.title("Controlul Fluxului Prin Fereastra Glisanta - Lefter Andrei, Georgiana Stefania Zaharia =^._.^=")
     root.geometry("1280x720")
-    root.resizable(False, False)
+    #root.resizable(False, False)
 
     #icon image source: https://www.freepik.com/icon/folder_7743796
     icon = tk.PhotoImage(file='icon.png')
@@ -167,7 +185,8 @@ def ui():
 
     folder_icon = tk.PhotoImage(file='folders2.png')
     file_icon = tk.PhotoImage(file='files.png')#https://www.pngwing.com/en/free-png-mflca
-    delete_item_icon=tk.PhotoImage(file='remove.png')
-    updateUI(folder_icon, file_icon,delete_item_icon)
+    delete_item_icon=tk.PhotoImage(file='remove.png') #
+    download_icon=tk.PhotoImage(file='download.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/download-download-3.html
+    updateUI(folder_icon, file_icon,delete_item_icon,download_icon)
 
     root.mainloop()
