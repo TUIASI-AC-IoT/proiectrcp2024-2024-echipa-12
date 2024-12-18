@@ -1,11 +1,9 @@
 import socket as sc
 import threading as Thread
-import time
 from time import sleep
-from unpacking_util import unpack
-import encoder, queue
-import util
-from util import actionQ
+from transfer_util.unpacking_util import unpack
+import transfer_util.encoder as encoder
+import transfer_util.util as util
 
 lock = Thread.Lock()
 new_message_event = Thread.Event()
@@ -19,7 +17,7 @@ def send_packet(udp_ip, udp_port, scket):
         message = ""
         #new_message_event.wait()
         #print(actionQ.get())
-        if not util.actionQ.qsize()!=0:
+        if not util.actionQ.qsize() != 0:
             message = util.actionQ.get()
             #print(message)
         with lock:
@@ -34,11 +32,13 @@ def send_packet(udp_ip, udp_port, scket):
                     #scket.sendto(mess, (udp_ip, udp_port))
                     #mess = encoder.packing(util.COMMAND_NO_PARAMS, 0, util.LS)
                 elif(msg[0] == "rmdir"):
-                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0,command_id=util.RM_RMDIR, data=msg[1])
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0, command_id=util.RM_RMDIR, data=msg[1])
                 elif(msg[0] == "mkdir"):
-                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0,command_id=util.MKDIR, data=msg[1])
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0, command_id=util.MKDIR, data=msg[1])
+                elif(msg[0] == "up"):
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0, command_id=util.UPLOAD_REQ, data=msg[1])
                 print("sending message...")
-                print("am trimis mesajul", mess, " ", time.time()*100%10000)
+                print("am trimis mesajul", mess)
                 scket.sendto(mess, (udp_ip, udp_port))
                 message = ""
                 #frame_number+=1

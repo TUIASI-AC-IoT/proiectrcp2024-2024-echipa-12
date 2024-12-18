@@ -1,9 +1,10 @@
 import subprocess
-import time
+import os, struct, socket
 
-import util, os, struct, socket
-from encoder import packing
-from util import ackQ, filechunkQ, uiupdateQ
+import transfer_util.util as util
+from transfer_util.encoder import packing
+from transfer_util.util import uiupdateQ
+
 
 def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     type_flag = packet[0]
@@ -12,20 +13,27 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     if type_flag == util.ACK:
         data = None
         #print("AM PRIMIT ACK")
-
+        # TODO: chestie fereastra glisanta
+        # util.current_file !!grija sa inchizi fisierul cand primesti ultimul ack
     elif type_flag == util.ACK_COMMAND:
         data = None
+        # TODO: vedem daca dam resend la comenzi
+        if cmd_id == util.UPLOAD_REQ:
+            util.upload_flag = True
         #print("AM PRIMIT ACK CMD!")
 
     elif type_flag == util.ACK_COMMAND_W_OUTPUT:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
         uiupdateQ.put(data)
-        print("AM PRIMIT ACK CMD:\n", data ,"\ntimestamp ", time.time()*100%10000)
+        print("AM PRIMIT ACK CMD:\n", data ,"\n")
 
     elif type_flag == util.FILE_CHUNK:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])
         sock.sendto(packing(util.ACK, frame_no, 0, None), address)
-        #TODO: chestie fereastra glisanta
+        # TODO: chestie fereastra glisanta
+        if frame_no == util.current_frame + 1:
+            with open(util.path + data, 'ab') as file:
+                pass
 
     elif type_flag == util.COMMAND_W_PARAMS:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
@@ -40,7 +48,8 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             os.system(f'mkdir {util.path + data}')
         elif cmd_id == util.RM_RMDIR:
             if os.path.isdir(util.path + data):
-                os.removedirs(util.path + data)
+                #os.removedirs(util.path + data)
+                os.system(f'rmdir "{util.path + data}" /s /q')
             else:
                 os.remove(util.path + data)
         elif cmd_id == util.MOVE:
@@ -49,11 +58,19 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         elif cmd_id == util.TOUCH:
             with open(util.path + data, 'w') as file:
                 pass
-        sock.sendto(packing(util.ACK, 0, cmd_id, None), address) # Trimite ACK pt comanda
+        elif cmd_id == util.DOWNLOAD_REQ:
+            with open(util.path + data, 'w') as file:
+                pass
+            util.current_frame = 0
+            # TODO: send to sliding window
+            pass
+        elif cmd_id == util.UPLOAD_REQ:
+            #TODO: send to sliding window
+            util.current_file = open(util.path + data, 'wb')
+        sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
     elif type_flag == util.COMMAND_NO_PARAMS:
         if cmd_id == util.LS:
             #command = f'DIR /B {util.path}'
-
             #aflam foldere din directorul curent
             folder_command = f'for /f "tokens=*" %i in (\'dir /b /a:d "{util.path}"\') do @echo Folder: %i'
             folder_result = subprocess.run(folder_command, shell=True, text=True, capture_output=True)
@@ -63,7 +80,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
 
             #combinam totul
             output = folder_result.stdout + file_result.stdout
-            print("ls primit\n", output,  "\ntimestamp: ", time.time()*100%10000)
+            print("ls primit\n", output)
+            # trimite ACK pt comanda cu output
             sock.sendto(packing(util.ACK_COMMAND_W_OUTPUT, 0, cmd_id, output), address)
-            #trimite ACK pt comanda cu output
     return None

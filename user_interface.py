@@ -1,12 +1,13 @@
-import os
-import time
 import tkinter as tk
-from util import uiupdateQ, actionQ
+
+from transfer_util import util
+from transfer_util.util import uiupdateQ, actionQ
 import customtkinter as ctk
 from tkinter import filedialog
 
 
 def ui():
+    global file_to_transfer
     def updateUI(folder_icon, file_icon,delete_item_icon,download_icon):
         for widget in fileframe.winfo_children():
             widget.destroy()
@@ -28,10 +29,10 @@ def ui():
         btn.grid(row=1,column=0)
         data = None
 
-        print("aici iau din q:", time.time() * 100 % 10000)
+        #print("aici iau din q:", time.time() * 100 % 10000)
         data = uiupdateQ.get()
         print(data)
-        print("aici e ce e in q:", data , "\n", time.time() * 100 % 10000)
+        #print("aici e ce e in q:", data , "\n", time.time() * 100 % 10000)
         if data is not None:
             data = data.split('\n')
             files = []
@@ -91,7 +92,7 @@ def ui():
                     height=10,
                     fg_color='#191919',
                     image=file_icon,
-                    command=lambda: actionQ.put("cd@i"),
+                    command=lambda: None,#actionQ.put("cd@i"),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
                     anchor="w",
@@ -143,12 +144,13 @@ def ui():
         text=textbox.get("0.0", "end")
         return text
 
-    def take_file_path(): #pune in variabila globala path-ul fisierului ales
-        global upload_file_path
-        upload_file_path = filedialog.askopenfilename(filetypes=[("File", "*.*")],
+    def take_file_path(textbox_element): #pune in variabila globala path-ul fisierului ales
+       textbox_element.delete("0.0", "end")
+       file_to_transfer = filedialog.askopenfilename(filetypes=[("File", "*.*")],
                                               initialdir="C:/",
                                               title="Load file")
-        print(upload_file_path)
+       textbox_element.insert("0.0", file_to_transfer)
+
 
     root = ctk.CTk(fg_color="#191919")
     root.title("Controlul Fluxului Prin Fereastra Glisanta - Lefter Andrei, Georgiana Stefania Zaharia =^._.^=")
@@ -156,7 +158,7 @@ def ui():
     #root.resizable(False, False)
 
     #icon image source: https://www.freepik.com/icon/folder_7743796
-    icon = tk.PhotoImage(file='icon.png')
+    icon = tk.PhotoImage(file='icons/icon.png')
 
     root.wm_iconbitmap() #n am idee de ce nu se schimba iconita daca nu e asta sincer
     root.iconphoto(False, icon)
@@ -190,16 +192,23 @@ def ui():
     )
     btn_new_file.place(x=30, y=500)
 
+    #======= upload buttons
     upload_icon = tk.PhotoImage(
-        file='upload_icon.png')  # https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
-    btn_upload = ctk.CTkButton(
+        file='icons/upload_icon.png')  # https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
+
+    filepath_textbox = ctk.CTkTextbox(root, width=300, height=32, font=("Arial", 18))
+    filepath_textbox.place(x=750, y=500)
+    filepath_textbox.insert("0.0", " ")
+    #file_to_transfer = textbox.get("0.0", "end").strip()
+    #filepath_textbox.delete("0.0", "end")
+    btn_choose_file = ctk.CTkButton(
         root,
-        text="Upload",
+        text="Choose File...",
         width=80,
         height=32,
         fg_color='#191919',
-        image=upload_icon,
-        command=take_file_path,  # filename)),
+        #image=upload_icon,
+        command=lambda fp=filepath_textbox: take_file_path(fp),  # filename)),
         font=("Arial", 18),
         compound=ctk.LEFT,
         anchor="w",
@@ -208,15 +217,34 @@ def ui():
         border_width=1,
         border_color='white',
     )
-    btn_upload.place(x=615, y=500)
+    btn_choose_file.place(x=615, y=500)
+    btn_upload = ctk.CTkButton(
+        root,
+        text="Upload",
+        width=80,
+        height=32,
+        fg_color='#191919',
+        image=upload_icon,
+        command= lambda: (
+                actionQ.put(f'up@{util.file_to_transfer}') if util.file_to_transfer else None,
+        ),#lambda fp=filepath_textbox: take_file_path(fp),  # filename)),
+        font=("Arial", 18),
+        compound=ctk.LEFT,
+        anchor="w",
+        hover_color="#505050",
+        corner_radius=0,
+        border_width=1,
+        border_color='white',
+    )
+    btn_upload.place(x=1015, y=500)
 
     # ===============
 
-    folder_icon = tk.PhotoImage(file='folders2.png')
-    file_icon = tk.PhotoImage(file='files.png')#https://www.pngwing.com/en/free-png-mflca
-    delete_item_icon=tk.PhotoImage(file='remove.png') #
-    download_icon=tk.PhotoImage(file='download.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/download-download-3.html
-    # upload_icon=tk.PhotoImage(file='upload_icon.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
+    folder_icon = tk.PhotoImage(file='icons/folders2.png')
+    file_icon = tk.PhotoImage(file='icons/files.png')#https://www.pngwing.com/en/free-png-mflca
+    delete_item_icon=tk.PhotoImage(file='icons/remove.png') #
+    download_icon=tk.PhotoImage(file='icons/download.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/download-download-3.html
+#    upload_icon=tk.PhotoImage(file='upload_icon.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
 
     updateUI(folder_icon, file_icon,delete_item_icon,download_icon)
 

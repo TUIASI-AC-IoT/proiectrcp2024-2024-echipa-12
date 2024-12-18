@@ -1,8 +1,7 @@
 import socket as sc
 import threading
 import queue
-import unpacking_util as up
-import util
+from transfer_util import util, unpacking_util as up
 
 
 def send():#q, s, socket, address):
@@ -14,7 +13,6 @@ def rcv(q, s, sock, address):
         a = up.unpack(data, sock, address)
         #print("AM PRIMIT UN MESAJ %s: " % data)
         #print("de la:", addr)
-
 
 socket = sc.socket(sc.AF_INET, sc.SOCK_DGRAM)
 socket.bind((util.server_ip, util.server_port))
