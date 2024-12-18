@@ -1,7 +1,10 @@
+import os
 import time
 import tkinter as tk
 from util import uiupdateQ, actionQ
 import customtkinter as ctk
+from tkinter import filedialog
+
 
 def ui():
     def updateUI(folder_icon, file_icon,delete_item_icon,download_icon):
@@ -15,7 +18,7 @@ def ui():
             height=10,
             fg_color='#191919',
             image=folder_icon,
-            command=lambda filename="..": (actionQ.put(f"cd@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon)),# filename)),
+            command=lambda filename="..": (actionQ.put(f"cd@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),# filename)),
             font=("Arial", 18),
             compound=ctk.LEFT,
             anchor="w",
@@ -49,7 +52,7 @@ def ui():
                     height=10,
                     fg_color='#191919',
                     image=folder_icon,
-                    command=lambda filename=i: (actionQ.put(f"cd@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon)),#filename)),
+                    command=lambda filename=i: (actionQ.put(f"cd@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),#filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
                     anchor="w",
@@ -67,7 +70,7 @@ def ui():
                     height=32,
                     image=delete_item_icon,
                     fg_color='#191919',
-                    command=lambda filename=i: (actionQ.put(f"rmdir@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon)),
+                    command=lambda filename=i: (actionQ.put(f"rmdir@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
                     # filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
@@ -106,7 +109,7 @@ def ui():
                     height=32,
                     fg_color='#191919',
                     image=delete_item_icon,
-                    command=lambda filename=i: (actionQ.put(f"rm@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon)),
+                    command=lambda filename=i: (actionQ.put(f"rm@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
                     # filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
@@ -136,11 +139,16 @@ def ui():
                 )
                 download_btn.grid(row=j, column=2)
 
-
-
     def get_text(textbox) -> str:
         text=textbox.get("0.0", "end")
         return text
+
+    def take_file_path(): #pune in variabila globala path-ul fisierului ales
+        global upload_file_path
+        upload_file_path = filedialog.askopenfilename(filetypes=[("File", "*.*")],
+                                              initialdir="C:/",
+                                              title="Load file")
+        print(upload_file_path)
 
     root = ctk.CTk(fg_color="#191919")
     root.title("Controlul Fluxului Prin Fereastra Glisanta - Lefter Andrei, Georgiana Stefania Zaharia =^._.^=")
@@ -170,7 +178,7 @@ def ui():
         height=32,
         fg_color='#191919',
         image="",
-        command=lambda: (actionQ.put(f"mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon)),
+        command=lambda: (actionQ.put(f"mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon,download_icon)),
         # filename)),
         font=("Arial", 18),
         compound=ctk.LEFT,
@@ -181,12 +189,35 @@ def ui():
         border_color='white',
     )
     btn_new_file.place(x=30, y=500)
+
+    upload_icon = tk.PhotoImage(
+        file='upload_icon.png')  # https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
+    btn_upload = ctk.CTkButton(
+        root,
+        text="Upload",
+        width=80,
+        height=32,
+        fg_color='#191919',
+        image=upload_icon,
+        command=take_file_path,  # filename)),
+        font=("Arial", 18),
+        compound=ctk.LEFT,
+        anchor="w",
+        hover_color="#505050",
+        corner_radius=0,
+        border_width=1,
+        border_color='white',
+    )
+    btn_upload.place(x=615, y=500)
+
     # ===============
 
     folder_icon = tk.PhotoImage(file='folders2.png')
     file_icon = tk.PhotoImage(file='files.png')#https://www.pngwing.com/en/free-png-mflca
     delete_item_icon=tk.PhotoImage(file='remove.png') #
     download_icon=tk.PhotoImage(file='download.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/download-download-3.html
+    # upload_icon=tk.PhotoImage(file='upload_icon.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
+
     updateUI(folder_icon, file_icon,delete_item_icon,download_icon)
 
     root.mainloop()
