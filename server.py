@@ -2,6 +2,8 @@ import socket as sc
 import threading
 import queue
 from transfer_util import util, unpacking_util as up
+import transfer_util.sending_util as sending_util
+from transfer_util.util import client_ip, client_port
 
 
 def send():#q, s, socket, address):
@@ -22,7 +24,7 @@ print("SERVER STARTED!")
 q = queue.Queue()
 sent = queue.Queue()
 
-sender = threading.Thread(target=send, args=())#q, sent, socket, (UDP_IP, clport)))
+sender = threading.Thread(target=sending_util.send, args=((util.client_ip, client_port), socket))#q, sent, socket, (UDP_IP, clport)))
 receiver = threading.Thread(target=rcv, args=(q, sent, socket, (util.client_ip, util.client_port)))
 sender.start()
 receiver.start()

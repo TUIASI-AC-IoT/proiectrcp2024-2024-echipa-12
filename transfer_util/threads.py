@@ -81,4 +81,4 @@ def make_message():
 def receive_packet(udp_ip, udp_port, scket:sc.socket):
     while True:
         pct, addr = scket.recvfrom(1024)
-        a = unpack(pct, scket, (udp_ip, udp_port))
+        unpack(pct, scket, (udp_ip, udp_port))

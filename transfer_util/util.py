@@ -55,6 +55,7 @@ file_buffer = []
 current_frame = 0
 file_to_transfer = ''
 upload_flag = False
+sent = []
 
 #SLIDING WINDOW SETTINGS
 window_size = 5
@@ -62,10 +63,10 @@ packet_data_size = 1024
 timeout_duration = 5 #secunde
 
 #OTHER SETTINGS
-packet_loss_mode = False
+packet_loss = .2
 
 #TODO: KNOWN ISSUES
 # 1. Daca incerc sa sterg fisier nu merge
 # 2. Daca incerc sa sterg folder cu fisiere in el crapa
-# 3. Daca pui space cand dai new folder iti face pana la space (not a bug, a feature :)))
+# 3. Daca pui space cand dai new folder iti face pana la space (not a bug, a feature :)))  # rezolvare: punem " " la mkdir
 # 4. TO BE CONTINUED PROBABIL...

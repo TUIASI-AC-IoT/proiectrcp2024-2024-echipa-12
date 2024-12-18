@@ -11,7 +11,7 @@ def ui():
     def updateUI(folder_icon, file_icon,delete_item_icon,download_icon):
         for widget in fileframe.winfo_children():
             widget.destroy()
-        actionQ.put('ls')
+        actionQ.put('c@ls')
         btn = ctk.CTkButton(
             fileframe,
             text="..",
@@ -19,7 +19,7 @@ def ui():
             height=10,
             fg_color='#191919',
             image=folder_icon,
-            command=lambda filename="..": (actionQ.put(f"cd@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),# filename)),
+            command=lambda filename="..": (actionQ.put(f"c@cd@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),# filename)),
             font=("Arial", 18),
             compound=ctk.LEFT,
             anchor="w",
@@ -53,7 +53,7 @@ def ui():
                     height=10,
                     fg_color='#191919',
                     image=folder_icon,
-                    command=lambda filename=i: (actionQ.put(f"cd@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),#filename)),
+                    command=lambda filename=i: (actionQ.put(f"c@cd@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),#filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
                     anchor="w",
@@ -71,7 +71,7 @@ def ui():
                     height=32,
                     image=delete_item_icon,
                     fg_color='#191919',
-                    command=lambda filename=i: (actionQ.put(f"rmdir@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
+                    command=lambda filename=i: (actionQ.put(f"c@rmdir@{filename}"),updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
                     # filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
@@ -110,7 +110,7 @@ def ui():
                     height=32,
                     fg_color='#191919',
                     image=delete_item_icon,
-                    command=lambda filename=i: (actionQ.put(f"rm@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
+                    command=lambda filename=i: (actionQ.put(f"c@rm@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
                     # filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
@@ -180,7 +180,7 @@ def ui():
         height=32,
         fg_color='#191919',
         image="",
-        command=lambda: (actionQ.put(f"mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon,download_icon)),
+        command=lambda: (actionQ.put(f"c@mkdir@{get_text(textbox)}"), updateUI(folder_icon, file_icon, delete_item_icon,download_icon)),
         # filename)),
         font=("Arial", 18),
         compound=ctk.LEFT,
@@ -226,7 +226,7 @@ def ui():
         fg_color='#191919',
         image=upload_icon,
         command= lambda: (
-                actionQ.put(f'up@{util.file_to_transfer}') if util.file_to_transfer else None,
+                actionQ.put(f'c@up@{util.file_to_transfer}') if util.file_to_transfer else None,
         ),#lambda fp=filepath_textbox: take_file_path(fp),  # filename)),
         font=("Arial", 18),
         compound=ctk.LEFT,

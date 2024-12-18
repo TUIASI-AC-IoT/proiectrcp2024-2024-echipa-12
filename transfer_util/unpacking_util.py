@@ -3,8 +3,8 @@ import os, struct, socket
 
 import transfer_util.util as util
 from transfer_util.encoder import packing
-from transfer_util.util import uiupdateQ
-
+from transfer_util.util import uiupdateQ, actionQ, file_buffer
+from transfer_util.sliding_window import createBuffer
 
 def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     type_flag = packet[0]
@@ -18,8 +18,8 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     elif type_flag == util.ACK_COMMAND:
         data = None
         # TODO: vedem daca dam resend la comenzi
-        if cmd_id == util.UPLOAD_REQ:
-            util.upload_flag = True
+        # if cmd_id == util.UPLOAD_REQ:
+        #     util.upload_flag = True
         #print("AM PRIMIT ACK CMD!")
 
     elif type_flag == util.ACK_COMMAND_W_OUTPUT:
@@ -29,12 +29,12 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
 
     elif type_flag == util.FILE_CHUNK:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])
-        sock.sendto(packing(util.ACK, frame_no, 0, None), address)
+        actionQ.put(f'a@f@{frame_no}') # send ack
         # TODO: chestie fereastra glisanta
-        if frame_no == util.current_frame + 1:
-            with open(util.path + data, 'ab') as file:
-                pass
-
+        # if frame_no == util.current_frame + 1:
+        #     with open(util.path + data, 'ab') as file:
+        #         pass
+        #util.file_buffer = createBuffer(data)
     elif type_flag == util.COMMAND_W_PARAMS:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
         if cmd_id == util.CD:
@@ -67,7 +67,8 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         elif cmd_id == util.UPLOAD_REQ:
             #TODO: send to sliding window
             util.current_file = open(util.path + data, 'wb')
-        sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
+        #sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
+        actionQ.put(f'a@c@{cmd_id}')
     elif type_flag == util.COMMAND_NO_PARAMS:
         if cmd_id == util.LS:
             #command = f'DIR /B {util.path}'
@@ -82,5 +83,6 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             output = folder_result.stdout + file_result.stdout
             print("ls primit\n", output)
             # trimite ACK pt comanda cu output
-            sock.sendto(packing(util.ACK_COMMAND_W_OUTPUT, 0, cmd_id, output), address)
+            #sock.sendto(packing(util.ACK_COMMAND_W_OUTPUT, 0, cmd_id, output), address)
+            actionQ.put(f'a@co@{cmd_id}@{output}')
     return None
