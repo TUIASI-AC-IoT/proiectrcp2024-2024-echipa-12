@@ -3,7 +3,7 @@ import os, struct, socket
 
 import transfer_util.util as util
 from transfer_util.encoder import packing
-from transfer_util.util import uiupdateQ, actionQ, file_buffer
+from transfer_util.util import uiupdateQ, actionQ, file_buffer, current_file, file_to_transfer
 from transfer_util.sliding_window import createBuffer
 
 def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
@@ -14,14 +14,17 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         data = None
         #print("AM PRIMIT ACK")
         # TODO: chestie fereastra glisanta
-        # util.current_file !!grija sa inchizi fisierul cand primesti ultimul ack
+        # TODO: util.current_file !!grija sa inchizi fisierul cand primesti ultimul ack
     elif type_flag == util.ACK_COMMAND:
         data = None
         # TODO: vedem daca dam resend la comenzi
         # if cmd_id == util.UPLOAD_REQ:
         #     util.upload_flag = True
         #print("AM PRIMIT ACK CMD!")
-
+        if cmd_id == util.UPLOAD_REQ:
+            util.window_position = 0
+            util.sending_buffer = createBuffer(file_to_transfer)
+            actionQ.put('f')
     elif type_flag == util.ACK_COMMAND_W_OUTPUT:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
         uiupdateQ.put(data)
@@ -66,7 +69,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             pass
         elif cmd_id == util.UPLOAD_REQ:
             #TODO: send to sliding window
-            util.current_file = open(util.path + data, 'wb')
+            util.current_file = open(util.path + data, 'ab')
         #sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
         actionQ.put(f'a@c@{cmd_id}')
     elif type_flag == util.COMMAND_NO_PARAMS:

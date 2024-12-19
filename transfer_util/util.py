@@ -53,9 +53,11 @@ class Ack:
 
 file_buffer = []
 current_frame = 0
+sending_buffer = []
 file_to_transfer = ''
 upload_flag = False
 sent = []
+window_position = 0
 
 #SLIDING WINDOW SETTINGS
 window_size = 5

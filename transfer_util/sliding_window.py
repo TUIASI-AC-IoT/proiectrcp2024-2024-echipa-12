@@ -19,11 +19,11 @@ class frame:
 
 
 def createBuffer(file_name: str):
-    dim = 20  #nr octeti data
+    dim = util.packet_data_size  #nr octeti data
     f = open(file_name, "rb")
     chunk = f.read(dim)
     buffer = []
-    i = 0
+    i = 1
     while chunk:
         pack = encoder.packing(util.FILE_CHUNK, i, 0, chunk)
         buffer.append(pack)
@@ -47,20 +47,20 @@ def move_list_one_pos_right(sliding_window):
     return sliding_window
 
 
-def slide_window(window, size_window, buffer, position):
+def slide_window(window, buffer, position):
     while window[0].rcv_ack:
         window = move_list_one_pos_right(window)
-        if len(buffer) > position + size_window:
-            window[size_window - 1].data = buffer[position]
+        if len(buffer) > position + util.window_size:
+            window[util.window_size - 1].data = buffer[position]
 
 
-def sw_send(window, size_window, buffer, position, sock, address: tuple[str, int], frame_no):
+def sw_send(window, buffer, position, sock, address: tuple[str, int], frame_no):
     var = timeout_fct(window)
     if var != -1:  #daca exista atunci va fi retrimis
         window[var].time = time.time()
         mess = encoder.packing(util.FILE_CHUNK, frame_no, 0, var.data)
         sock.sendto(mess, address)
-    slide_window(window, size_window, buffer, position)  #se muta fereastra daca este nevoie
+    slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
     for i in window:  #se cauta elemente care nu au fost trimise inca
         if i.time == 0:
             i.time = time.time()
@@ -68,5 +68,7 @@ def sw_send(window, size_window, buffer, position, sock, address: tuple[str, int
             sock.sendto(mess, address)
 
 # lista=[0,2,3,4,5,1]
-# lista=move_list_one_pos_left(lista)
+# lista=move_list_one_pos_right(lista)
+# lista=move_list_one_pos_right(lista)
+# lista=move_list_one_pos_right(lista)
 # print(lista)

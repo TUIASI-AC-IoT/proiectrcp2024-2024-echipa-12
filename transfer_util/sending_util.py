@@ -1,6 +1,7 @@
 from socket import socket
 import transfer_util.encoder as encoder
 import transfer_util.util as util
+from transfer_util.sliding_window import sw_send
 
 
 def send(address:[str, int], scket:socket) -> None:
@@ -17,6 +18,7 @@ def send(address:[str, int], scket:socket) -> None:
 
             if msg[0] == "f":
                 #TODO: here lays the sliding window for file transfer
+                sw_send()
                 mess = 'a'
                 pass
             elif msg[0] == "a":
