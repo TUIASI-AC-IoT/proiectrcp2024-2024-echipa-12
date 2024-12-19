@@ -18,9 +18,10 @@ def send(address:[str, int], scket:socket) -> None:
 
             if msg[0] == "f":
                 #TODO: here lays the sliding window for file transfer
-                sw_send()
-                mess = 'a'
-                pass
+
+                sw_send(util.window,util.sending_buffer,util.window_position,scket,address)#frame number)
+                mess = ''
+
             elif msg[0] == "a":
                 ack_type = msg[1]
                 if ack_type == "c": #command
@@ -29,6 +30,9 @@ def send(address:[str, int], scket:socket) -> None:
                     mess = encoder.packing(util.ACK_COMMAND_W_OUTPUT, 0, int(msg[2]), msg[3])
                 elif ack_type == "f": #file chunk
                     mess = encoder.packing(util.ACK_COMMAND, int(msg[1]), 0, None)
+                # print("sending message...")
+                # print("am trimis mesajul", mess)
+                # scket.sendto(mess, address)
             elif msg[0] == "c":
                 cmd = msg[1]
                 data = msg[2] if len(msg) > 2 else None
@@ -42,10 +46,13 @@ def send(address:[str, int], scket:socket) -> None:
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.MKDIR, data)
                 elif cmd == "up":
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.UPLOAD_REQ, data)
-                pass
+                # print("sending message...")
+                # print("am trimis mesajul", mess)
+                # scket.sendto(mess, address)
 
             # elif (msg[0] == "ack"):
             #     mess = encoder.packing(ACK_COMMAND, 0, command_id=util.ACK, data=msg[1])
-            print("sending message...")
-            print("am trimis mesajul", mess)
-            scket.sendto(mess, address)
+            if mess != "":
+                print("sending message...")
+                print("am trimis mesajul", mess)
+                scket.sendto(mess, address)

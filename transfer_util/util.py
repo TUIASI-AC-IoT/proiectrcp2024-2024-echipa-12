@@ -58,6 +58,10 @@ file_to_transfer = ''
 upload_flag = False
 sent = []
 window_position = 0
+window = []
+
+#semaphore for sliding window
+smphr_sending_file=False
 
 #SLIDING WINDOW SETTINGS
 window_size = 5

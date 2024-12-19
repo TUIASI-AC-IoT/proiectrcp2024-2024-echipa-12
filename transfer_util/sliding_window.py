@@ -1,14 +1,15 @@
-import encoder
-import time
+from pkg_resources import non_empty_lines
 
-import util
+from transfer_util import encoder
+import time
+from transfer_util import util
 
 timeout = 10
 
 
 #==================================
-#                  |boolean|boolean|
-#|sending_time|pack|rcv_ack| sent  |
+#             |    | boolean |
+#|sending_time|data| rcv_ack |
 #==================================
 
 class frame:
@@ -16,14 +17,15 @@ class frame:
         self.sending_time = 0
         self.data = None
         self.rcv_ack = False
-
+        #incercam
+        self.frame_no = -1 #va avea aceeasi valoare ca nr frame-ului in buffer
 
 def createBuffer(file_name: str):
     dim = util.packet_data_size  #nr octeti data
-    f = open(file_name, "rb")
+    f = open(file_name, "r")
     chunk = f.read(dim)
     buffer = []
-    i = 1
+    i = 0
     while chunk:
         pack = encoder.packing(util.FILE_CHUNK, i, 0, chunk)
         buffer.append(pack)
@@ -32,11 +34,22 @@ def createBuffer(file_name: str):
     f.close()
     return buffer
 
+def createWindow():
+    for i in range (min(util.window_size - 1, len(util.sending_buffer))):
+        if i != None:
+            frame_elem = frame()
+            frame_elem.data=util.sending_buffer[i]
+            frame_elem.frame_no = i
+            if util.window == None:
+                util.window = frame_elem
+            else:
+                util.window.append(frame_elem)
 
 def timeout_fct(window: list[frame]):  # window -> lista de frame-uri
-    for i in window:
-        if (i.time + timeout > time.time()):
-            return i  #trebuie retrimis
+    if window!=None:
+        for i in window:
+            if (i.time + timeout > time.time()):
+                return i  #trebuie retrimis
     return -1  #nu trebuie retrimis niciun pachet
 
 
@@ -48,27 +61,27 @@ def move_list_one_pos_right(sliding_window):
 
 
 def slide_window(window, buffer, position):
-    while window[0].rcv_ack:
-        window = move_list_one_pos_right(window)
-        if len(buffer) > position + util.window_size:
-            window[util.window_size - 1].data = buffer[position]
+    if window!=None:
+        while window[0].rcv_ack:
+            window = move_list_one_pos_right(window)
+            if len(buffer) > position + util.window_size:
+                window[util.window_size - 1].frame_no = position
+                window[util.window_size - 1].data = buffer[position]
 
 
-def sw_send(window, buffer, position, sock, address: tuple[str, int], frame_no):
+def sw_send(window, buffer, position, sock, address: tuple[str, int]):
     var = timeout_fct(window)
-    if var != -1:  #daca exista atunci va fi retrimis
-        window[var].time = time.time()
-        mess = encoder.packing(util.FILE_CHUNK, frame_no, 0, var.data)
-        sock.sendto(mess, address)
-    slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
-    for i in window:  #se cauta elemente care nu au fost trimise inca
-        if i.time == 0:
-            i.time = time.time()
-            mess = encoder.packing(util.FILE_CHUNK, frame_no, 0, var.data)
+    while var != -1:  #atata timp cat exista vreun fisier in timeout va fi retrimit
+        if(window[var]!=None):
+            window[var].time = time.time()
+            mess = encoder.packing(util.FILE_CHUNK, window[var].frame_no, 0, var.data)
             sock.sendto(mess, address)
+            var = timeout_fct(window)
+    slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
+    if window!=None:
+        for i in window:  #se cauta elemente care nu au fost trimise inca
+            if i.time == 0 and i.data!=None:
+                i.time = time.time()
+                mess = encoder.packing(util.FILE_CHUNK, i.frame_no, 0, var.data)
+                sock.sendto(mess, address)
 
-# lista=[0,2,3,4,5,1]
-# lista=move_list_one_pos_right(lista)
-# lista=move_list_one_pos_right(lista)
-# lista=move_list_one_pos_right(lista)
-# print(lista)

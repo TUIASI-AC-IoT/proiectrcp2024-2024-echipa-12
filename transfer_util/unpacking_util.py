@@ -4,7 +4,8 @@ import os, struct, socket
 import transfer_util.util as util
 from transfer_util.encoder import packing
 from transfer_util.util import uiupdateQ, actionQ, file_buffer, current_file, file_to_transfer
-from transfer_util.sliding_window import createBuffer
+from transfer_util.sliding_window import createBuffer, createWindow
+
 
 def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     type_flag = packet[0]
@@ -23,7 +24,8 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         #print("AM PRIMIT ACK CMD!")
         if cmd_id == util.UPLOAD_REQ:
             util.window_position = 0
-            util.sending_buffer = createBuffer(file_to_transfer)
+            util.sending_buffer = createBuffer(util.file_to_transfer)
+            util.window = createWindow()
             actionQ.put('f')
     elif type_flag == util.ACK_COMMAND_W_OUTPUT:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
@@ -51,8 +53,8 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             os.system(f'mkdir {util.path + data}')
         elif cmd_id == util.RM_RMDIR:
             if os.path.isdir(util.path + data):
-                #os.removedirs(util.path + data)
-                os.system(f'rmdir "{util.path + data}" /s /q')
+                os.removedirs(util.path + data)
+                #os.system(f'rmdir "{util.path + data}" /s /q')
             else:
                 os.remove(util.path + data)
         elif cmd_id == util.MOVE:
@@ -69,8 +71,11 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             pass
         elif cmd_id == util.UPLOAD_REQ:
             #TODO: send to sliding window
-            util.current_file = open(util.path + data, 'ab')
-        #sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
+          #  util.current_file = open(util.path + data, 'rb')
+            print("=======================")
+            print(data)
+           # util.current_file = open(data, 'wb')
+           # sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
         actionQ.put(f'a@c@{cmd_id}')
     elif type_flag == util.COMMAND_NO_PARAMS:
         if cmd_id == util.LS:

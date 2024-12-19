@@ -146,10 +146,10 @@ def ui():
 
     def take_file_path(textbox_element): #pune in variabila globala path-ul fisierului ales
        textbox_element.delete("0.0", "end")
-       file_to_transfer = filedialog.askopenfilename(filetypes=[("File", "*.*")],
+       util.file_to_transfer = filedialog.askopenfilename(filetypes=[("File", "*.*")],
                                               initialdir="C:/",
                                               title="Load file")
-       textbox_element.insert("0.0", file_to_transfer)
+       textbox_element.insert("0.0",  util.file_to_transfer)
 
 
     root = ctk.CTk(fg_color="#191919")
@@ -244,7 +244,6 @@ def ui():
     file_icon = tk.PhotoImage(file='icons/files.png')#https://www.pngwing.com/en/free-png-mflca
     delete_item_icon=tk.PhotoImage(file='icons/remove.png') #
     download_icon=tk.PhotoImage(file='icons/download.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/download-download-3.html
-#    upload_icon=tk.PhotoImage(file='upload_icon.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
 
     updateUI(folder_icon, file_icon,delete_item_icon,download_icon)
 
