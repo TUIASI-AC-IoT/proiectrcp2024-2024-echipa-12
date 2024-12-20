@@ -70,18 +70,20 @@ def slide_window(window, buffer, position):
 
 
 def sw_send(window, buffer, position, sock, address: tuple[str, int]):
+    print(util.window, "\n", util.sending_buffer)
     var = timeout_fct(window)
     while var != -1:  #atata timp cat exista vreun fisier in timeout va fi retrimit
         if(window[var]!=None):
             window[var].time = time.time()
             mess = encoder.packing(util.FILE_CHUNK, window[var].frame_no, 0, var.data)
-            sock.sendto(mess, address)
+            sock.sendto(mess+b'fisier', address)
             var = timeout_fct(window)
+            print('retrimis')
     slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
     if window!=None:
         for i in window:  #se cauta elemente care nu au fost trimise inca
             if i.time == 0 and i.data!=None:
                 i.time = time.time()
                 mess = encoder.packing(util.FILE_CHUNK, i.frame_no, 0, var.data)
-                sock.sendto(mess, address)
-
+                sock.sendto(mess+b'fisier', address)
+                print('trimis pt ca fereastra')

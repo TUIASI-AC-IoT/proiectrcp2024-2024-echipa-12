@@ -1,14 +1,23 @@
+import queue
+import threading
 from socket import socket
+from time import sleep
+
 import transfer_util.encoder as encoder
 import transfer_util.util as util
 from transfer_util.sliding_window import sw_send
+from transfer_util.util import actionQ
 
 
 def send(address:[str, int], scket:socket) -> None:
     while True:
         message = ""
-        if not util.actionQ.qsize() != 0:
+        try:
             message = util.actionQ.get()
+        except queue.Empty:
+            #print("Queue is empty")
+            message = ""
+        #message = actionQ.get()
         if message != "":
             msg = message.split("@")
             #msg[0] va fi tipul pachetului:
@@ -18,10 +27,10 @@ def send(address:[str, int], scket:socket) -> None:
 
             if msg[0] == "f":
                 #TODO: here lays the sliding window for file transfer
-
-                sw_send(util.window,util.sending_buffer,util.window_position,scket,address)#frame number)
+                fereastra = threading.Thread(target=sw_send, args=(util.window,util.sending_buffer,util.window_position,scket,address))
+                fereastra.start()
                 mess = ''
-
+                fereastra.join()
             elif msg[0] == "a":
                 ack_type = msg[1]
                 if ack_type == "c": #command
