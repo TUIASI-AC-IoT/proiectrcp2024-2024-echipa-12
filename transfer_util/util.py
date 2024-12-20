@@ -66,10 +66,13 @@ smphr_sending_file=False
 #SLIDING WINDOW SETTINGS
 window_size = 5
 packet_data_size = 1024
-timeout_duration = 5 #secunde
+timeout_duration = 1 #secunde
+
 
 #OTHER SETTINGS
 packet_loss = .2
+
+
 
 #TODO: KNOWN ISSUES
 # 1. Daca incerc sa sterg fisier nu merge

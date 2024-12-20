@@ -3,6 +3,7 @@ from pkg_resources import non_empty_lines
 from transfer_util import encoder
 import time
 from transfer_util import util
+from transfer_util.util import sending_buffer, window_size
 
 timeout = 10
 
@@ -22,33 +23,35 @@ class frame:
 
 def createBuffer(file_name: str):
     dim = util.packet_data_size  #nr octeti data
-    f = open(file_name, "r")
+    f = open(file_name, "rb")
     chunk = f.read(dim)
     buffer = []
     i = 0
     while chunk:
-        pack = encoder.packing(util.FILE_CHUNK, i, 0, chunk)
-        buffer.append(pack)
+        #pack = encoder.packing(util.FILE_CHUNK, i, 0, chunk)
+        buffer.append(chunk)
         i += 1
         chunk = f.read(dim)
     f.close()
     return buffer
 
 def createWindow():
-    for i in range (min(util.window_size - 1, len(util.sending_buffer))):
-        if i != None:
-            frame_elem = frame()
-            frame_elem.data=util.sending_buffer[i]
-            frame_elem.frame_no = i
-            if util.window == None:
-                util.window = frame_elem
-            else:
-                util.window.append(frame_elem)
+    # while len(util.sending_buffer) < util.packet_data_size:
+    #     util.sending_buffer
+    cnt = 0
+    for i in util.sending_buffer:
+        if cnt == util.window_size:
+            break
+        frame_elem = frame()
+        frame_elem.data = i
+        frame_elem.frame_no = cnt
+        util.window.append(frame_elem)
+        cnt += 1
 
 def timeout_fct(window: list[frame]):  # window -> lista de frame-uri
     if window!=None:
         for i in window:
-            if (i.time + timeout > time.time()):
+            if i.sending_time + timeout > time.time():
                 return i  #trebuie retrimis
     return -1  #nu trebuie retrimis niciun pachet
 
@@ -70,20 +73,21 @@ def slide_window(window, buffer, position):
 
 
 def sw_send(window, buffer, position, sock, address: tuple[str, int]):
-    print(util.window, "\n", util.sending_buffer)
-    var = timeout_fct(window)
-    while var != -1:  #atata timp cat exista vreun fisier in timeout va fi retrimit
-        if(window[var]!=None):
-            window[var].time = time.time()
-            mess = encoder.packing(util.FILE_CHUNK, window[var].frame_no, 0, var.data)
-            sock.sendto(mess+b'fisier', address)
-            var = timeout_fct(window)
-            print('retrimis')
-    slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
-    if window!=None:
-        for i in window:  #se cauta elemente care nu au fost trimise inca
-            if i.time == 0 and i.data!=None:
-                i.time = time.time()
-                mess = encoder.packing(util.FILE_CHUNK, i.frame_no, 0, var.data)
+    while position + util.window_size <= len(buffer):
+        print(util.window, "\n", util.sending_buffer)
+        var = timeout_fct(window)
+        while var != -1:  #atata timp cat exista vreun fisier in timeout va fi retrimit
+            if(var!=None):
+                var.sending_time = time.time()
+                mess = encoder.packing(util.FILE_CHUNK, window[var].frame_no, 0, var.data)
                 sock.sendto(mess+b'fisier', address)
-                print('trimis pt ca fereastra')
+                var = timeout_fct(window)
+                print('retrimis')
+        slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
+        if window!=None:
+            for i in window:  #se cauta elemente care nu au fost trimise inca
+                if i.sending_time == 0 and i.data!=None:
+                    i.sending_time = time.time()
+                    mess = encoder.packing(util.FILE_CHUNK, i.frame_no, 0, i.data)
+                    sock.sendto(mess+b'fisier', address)
+                    print('trimis pt ca fereastra')

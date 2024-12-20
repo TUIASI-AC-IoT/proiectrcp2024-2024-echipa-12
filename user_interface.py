@@ -1,3 +1,4 @@
+import queue
 import tkinter as tk
 
 from transfer_util import util

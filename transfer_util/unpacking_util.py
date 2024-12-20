@@ -25,7 +25,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         if cmd_id == util.UPLOAD_REQ:
             util.window_position = 0
             util.sending_buffer = createBuffer(util.file_to_transfer)
-            util.window = createWindow()
+            createWindow()
             actionQ.put('f')
     elif type_flag == util.ACK_COMMAND_W_OUTPUT:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')

@@ -11,7 +11,7 @@ def send():#q, s, socket, address):
 
 def rcv(q, s, sock, address):
     while True:
-        data, addr = sock.recvfrom(1024)
+        data, addr = sock.recvfrom(1035)
         a = up.unpack(data, sock, address)
         #print("AM PRIMIT UN MESAJ %s: " % data)
         #print("de la:", addr)
