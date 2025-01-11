@@ -1,5 +1,6 @@
 import subprocess
 import os, struct, socket
+import time
 
 import transfer_util.util as util
 from transfer_util.encoder import packing
@@ -13,9 +14,23 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     cmd_id = struct.unpack('!c', packet[3:4])[0][0]
     if type_flag == util.ACK:
         data = None
+        print("---------------------")
+        print(util.window[frame_no].sending_time)
+        print(time.time())
+        print(util.window[frame_no].rcv_ack)
+        print("---------------------")
+        util.window[frame_no].rcv_ack = True
         #print("AM PRIMIT ACK")
         # TODO: chestie fereastra glisanta
         # TODO: util.current_file !!grija sa inchizi fisierul cand primesti ultimul ack
+    elif type_flag == util.FILE_CHUNK:
+        data = struct.unpack(f'{len(packet) - 4}s', packet[4:])
+        actionQ.put(f'a@f@{frame_no}') # send ack
+        # TODO: chestie fereastra glisanta
+        # if frame_no == util.current_frame + 1:
+        #     with open(util.path + data, 'ab') as file:
+        #         pass
+        #util.file_buffer = createBuffer(data)
     elif type_flag == util.ACK_COMMAND:
         data = None
         # TODO: vedem daca dam resend la comenzi
@@ -32,14 +47,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         uiupdateQ.put(data)
         print("AM PRIMIT ACK CMD:\n", data ,"\n")
 
-    elif type_flag == util.FILE_CHUNK:
-        data = struct.unpack(f'{len(packet) - 4}s', packet[4:])
-        actionQ.put(f'a@f@{frame_no}') # send ack
-        # TODO: chestie fereastra glisanta
-        # if frame_no == util.current_frame + 1:
-        #     with open(util.path + data, 'ab') as file:
-        #         pass
-        #util.file_buffer = createBuffer(data)
+
     elif type_flag == util.COMMAND_W_PARAMS:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])[0].decode('utf-8')
         if cmd_id == util.CD:
@@ -93,4 +101,5 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             # trimite ACK pt comanda cu output
             #sock.sendto(packing(util.ACK_COMMAND_W_OUTPUT, 0, cmd_id, output), address)
             actionQ.put(f'a@co@{cmd_id}@{output}')
+
     return None

@@ -11,6 +11,7 @@ from transfer_util.util import actionQ
 
 def send(address:[str, int], scket:socket) -> None:
     while True:
+
         message = ""
         try:
             message = util.actionQ.get()
@@ -38,8 +39,8 @@ def send(address:[str, int], scket:socket) -> None:
                 elif ack_type == "co": #command with output
                     mess = encoder.packing(util.ACK_COMMAND_W_OUTPUT, 0, int(msg[2]), msg[3])
                 elif ack_type == "f": #file chunk
-                   # mess = encoder.packing(util.ACK_COMMAND, int(msg[2]), 0, None)
-                    mess = ''
+                    mess = encoder.packing(util.ACK, int(msg[2]), 0, None)
+                    # mess = ''
                 # print("sending message...")
                 # print("am trimis mesajul", mess)
                 # scket.sendto(mess, address)

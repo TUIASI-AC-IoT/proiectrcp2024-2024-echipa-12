@@ -32,7 +32,6 @@ def ui():
 
         #print("aici iau din q:", time.time() * 100 % 10000)
         data = uiupdateQ.get()
-        print(data)
         #print("aici e ce e in q:", data , "\n", time.time() * 100 % 10000)
         if data is not None:
             data = data.split('\n')
