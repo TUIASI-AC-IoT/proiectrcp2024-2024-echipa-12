@@ -67,7 +67,8 @@ smphr_sending_file=False
 window_size = 5
 packet_data_size = 1024
 timeout_duration = 1 #secunde
-
+posfirst=0
+poslast=posfirst+window_size-1
 
 #OTHER SETTINGS
 packet_loss = .2

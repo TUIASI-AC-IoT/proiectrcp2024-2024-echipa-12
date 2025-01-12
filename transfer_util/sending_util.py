@@ -5,7 +5,7 @@ from time import sleep
 
 import transfer_util.encoder as encoder
 import transfer_util.util as util
-from transfer_util.sliding_window import sw_send
+from transfer_util.sliding_window_2 import sw_send
 from transfer_util.util import actionQ
 
 
@@ -28,7 +28,7 @@ def send(address:[str, int], scket:socket) -> None:
 
             if msg[0] == "f":
                 #TODO: here lays the sliding window for file transfer
-                fereastra = threading.Thread(target=sw_send, args=(util.window,util.sending_buffer,util.window_position,scket,address))
+                fereastra = threading.Thread(target=sw_send, args=(scket,address))
                 fereastra.start()
                 mess = ''
                 fereastra.join()

@@ -5,7 +5,7 @@ import time
 import transfer_util.util as util
 from transfer_util.encoder import packing
 from transfer_util.util import uiupdateQ, actionQ, file_buffer, current_file, file_to_transfer
-from transfer_util.sliding_window import createBuffer, createWindow
+from transfer_util.sliding_window_2 import createBuffer, createWindow
 
 
 def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
