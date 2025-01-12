@@ -3,7 +3,7 @@ from pkg_resources import non_empty_lines
 from transfer_util import encoder
 import time
 from transfer_util import util
-from transfer_util.util import sending_buffer, window_size
+
 
 timeout = 10
 
@@ -47,7 +47,6 @@ def createWindow():
         frame_elem.frame_no = cnt
         util.window.append(frame_elem)
         cnt += 1
-
 def timeout_fct(window: list[frame]):  # window -> lista de frame-uri
     if window!=None:
         for i in window:
@@ -63,17 +62,24 @@ def move_list_one_pos_right(sliding_window):
     return sliding_window
 
 
-def slide_window(window, buffer, position):
+def slide_window(window, buffer):
     if window!=None:
         while window[0].rcv_ack:
             window = move_list_one_pos_right(window)
-            if len(buffer) > position + util.window_size:
-                window[util.window_size - 1].frame_no = position
-                window[util.window_size - 1].data = buffer[position]
+            if len(buffer) > util.window_position + util.window_size:
+                #print("aici a intrat")
+                window[util.window_size - 1].frame_no = util.window_position
+                window[util.window_size - 1].data = buffer[util.window_position]
+                window[util.window_size - 1].rcv_ack = False
+                window[util.window_size - 1].sending_time = 0
+                util.window_position += 1
+                #print(util.window_position)
+            else:
+                break
 
 
 def sw_send(window, buffer, position, sock, address: tuple[str, int]):
-    while position + util.window_size <= len(buffer):
+    while util.window_position + util.window_size <= len(buffer):
         # print(util.window, "\n", util.sending_buffer)
         var = timeout_fct(window)
 
@@ -84,10 +90,10 @@ def sw_send(window, buffer, position, sock, address: tuple[str, int]):
                 sock.sendto(mess+b'fisier', address)
                 var = timeout_fct(window)
                 print('retrimis')
-        slide_window(window, buffer, position)  #se muta fereastra daca este nevoie
+        slide_window(window, buffer)  #se muta fereastra daca este nevoie
         if window!=None:
             for i in window:  #se cauta elemente care nu au fost trimise inca
-                if i.sending_time == 0 and i.data!=None:
+                if i.sending_time == 0 and i.data!=None and i.rcv_ack == False:
                     i.sending_time = time.time()
                     mess = encoder.packing(util.FILE_CHUNK, i.frame_no, 0, i.data)
                     sock.sendto(mess+b'fisier', address)
