@@ -25,6 +25,7 @@ def createBuffer(file_name: str):
         i += 1
         chunk = f.read(dim)
     f.close()
+    print("dim buffer: ", len(buffer))
     return buffer
 
 def createWindow():
@@ -51,6 +52,8 @@ def move_list_one_pos_right():
         util.posfirst +=1
         util.poslast += 1
         print("s-a mutat")
+    elif util.posfirst < util.poslast:
+        util.posfirst += 1
     return mutat #mutat=0 -> nu se mai poate muta fereastra
 
 
@@ -59,9 +62,10 @@ def slide_window():
         while util.window[util.posfirst].rcv_ack:
             if (move_list_one_pos_right() == 0): #daca nu s-a facut nicio schimbare atunci
                 break #iesim din while
-            print(util.poslast)
-            util.posfirst += 1
-            util.poslast += 1
+            # print("ultima pozitie fereastra: ", util.poslast)
+            # print("prima pozitie fereastra: ", util.posfirst)
+            # util.posfirst += 1
+            # util.poslast += 1
 
 def something_to_send():
     for i in range(util.posfirst,util.poslast+1):
@@ -72,7 +76,7 @@ def something_to_send():
 
 def sw_send(sock, address: tuple[str, int]):
     to_elem=timeout_fct()
-    while util.window_size <= len(util.window) or to_elem != -1: #inca mai sunt elemente de parcurs sau avem un element in timeout
+    while util.window_size <= util.poslast+1 - util.posfirst or to_elem != -1: #inca mai sunt elemente de parcurs sau avem un element in timeout
         while to_elem != -1:  #atata timp cat exista o bucata de fisier in timeout va fi retrimisa
             util.window[to_elem].sending_time = time.time()
             mess = encoder.packing(util.FILE_CHUNK, to_elem, 0, util.window[to_elem].data)
@@ -81,8 +85,14 @@ def sw_send(sock, address: tuple[str, int]):
         slide_window()  #se muta fereastra daca este nevoie
 
         if something_to_send() == True:
-            for i in range(util.posfirst,util.poslast+1):  #se cauta elemente care nu au fost trimise inca
+            for i in range(util.posfirst, util.poslast+1):  #se cauta elemente care nu au fost trimise inca
+                print("i= ", i)
+                print("posfirst= ", util.posfirst)
+                print("poslast= ", util.poslast)
                 if util.window[i].sending_time == 0 and util.window[i].rcv_ack == False:
                     util.window[i].sending_time = time.time()
                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
                     sock.sendto(mess+b'fisier', address)
+               # time.sleep(1)
+        print("se trimite")
+    print("gata trimisul!")

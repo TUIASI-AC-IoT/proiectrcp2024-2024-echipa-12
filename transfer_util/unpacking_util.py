@@ -1,7 +1,7 @@
 import subprocess
 import os, struct, socket
 import time
-
+import shutil
 import transfer_util.util as util
 from transfer_util.encoder import packing
 from transfer_util.util import uiupdateQ, actionQ, file_buffer, current_file, file_to_transfer
@@ -15,8 +15,8 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     if type_flag == util.ACK:
         data = None
         print("---------------------")
-        print(util.window[frame_no].sending_time)
-        print(time.time())
+        #print(util.window[frame_no].sending_time)
+        #print(time.time())
         print(util.window[frame_no].rcv_ack)
         print("---------------------")
         util.window[frame_no].rcv_ack = True
@@ -60,10 +60,22 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         elif cmd_id == util.MKDIR:
             os.system(f'mkdir {util.path + data}')
         elif cmd_id == util.RM_RMDIR:
-            if os.path.isdir(util.path + data):
-                os.removedirs(util.path + data)
+            print("\n\n\n\n\nrm_rmdir:", os.path.join(util.path, data))
+            full_path = os.path.join(util.path, data)
+            if os.path.isfile(full_path):  # Check if it's a file
+                os.remove(full_path)
+            elif os.path.isdir(full_path):  # Check if it's a directory
+                if not os.listdir(full_path):  # Check if the directory is empty
+                    os.rmdir(full_path)
+                else:
+                    shutil.rmtree(full_path)
+            #if os.path.isdir(os.path.join(util.path, data)):
+            #if os.path.isdir(util.path + data):
+            #    shutil.rmtree(util.path + data)
+               # os.removedirs(util.path + data)
                 #os.system(f'rmdir "{util.path + data}" /s /q')
             else:
+                print('fiser')
                 os.remove(util.path + data)
         elif cmd_id == util.MOVE:
             data.split(' ')
@@ -97,7 +109,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
 
             #combinam totul
             output = folder_result.stdout + file_result.stdout
-            print("ls primit\n", output)
+            # print("ls primit\n", output)
             # trimite ACK pt comanda cu output
             #sock.sendto(packing(util.ACK_COMMAND_W_OUTPUT, 0, cmd_id, output), address)
             actionQ.put(f'a@co@{cmd_id}@{output}')

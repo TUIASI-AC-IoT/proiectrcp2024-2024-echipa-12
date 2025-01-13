@@ -1,5 +1,6 @@
 import queue
 import tkinter as tk
+import warnings
 
 from transfer_util import util
 from transfer_util.util import uiupdateQ, actionQ
@@ -8,6 +9,7 @@ from tkinter import filedialog
 
 
 def ui():
+    warnings.filterwarnings("ignore", module="customtkinter.*")
     global file_to_transfer
     def updateUI(folder_icon, file_icon,delete_item_icon,download_icon):
         for widget in fileframe.winfo_children():
@@ -110,7 +112,7 @@ def ui():
                     height=32,
                     fg_color='#191919',
                     image=delete_item_icon,
-                    command=lambda filename=i: (actionQ.put(f"c@rm@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
+                    command=lambda filename=i: (actionQ.put(f"c@rmdir@{filename}"), updateUI(folder_icon, file_icon,delete_item_icon,download_icon)),
                     # filename)),
                     font=("Arial", 18),
                     compound=ctk.LEFT,
@@ -147,7 +149,7 @@ def ui():
     def take_file_path(textbox_element): #pune in variabila globala path-ul fisierului ales
        textbox_element.delete("0.0", "end")
        util.file_to_transfer = filedialog.askopenfilename(filetypes=[("File", "*.*")],
-                                              initialdir="C:/",
+                                              initialdir="./",
                                               title="Load file")
        textbox_element.insert("0.0",  util.file_to_transfer)
 

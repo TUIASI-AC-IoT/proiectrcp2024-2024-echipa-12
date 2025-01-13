@@ -80,5 +80,10 @@ def make_message():
 
 def receive_packet(udp_ip, udp_port, scket:sc.socket):
     while True:
-        pct, addr = scket.recvfrom(1024)
-        unpack(pct, scket, (udp_ip, udp_port))
+        try:
+            pct, addr = scket.recvfrom(1024)
+            unpack(pct, scket, (udp_ip, udp_port))
+        except ConnectionResetError as e:
+            print(f"ConnectionResetError: {e}. Server might be offline")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
