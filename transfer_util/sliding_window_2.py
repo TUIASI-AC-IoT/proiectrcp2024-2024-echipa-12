@@ -70,7 +70,6 @@ def slide_window():
 def something_to_send():
     for i in range(util.posfirst,util.poslast+1):
         if util.window[i].rcv_ack == False or util.window[i].sending_time == 0:
-
             return True
     return False
 
@@ -82,17 +81,18 @@ def sw_send(sock, address: tuple[str, int]):
             mess = encoder.packing(util.FILE_CHUNK, to_elem, 0, util.window[to_elem].data)
             sock.sendto(mess+b'fisier', address)
             to_elem = timeout_fct()
+            print("se trimite")
         slide_window()  #se muta fereastra daca este nevoie
 
         if something_to_send() == True:
             for i in range(util.posfirst, util.poslast+1):  #se cauta elemente care nu au fost trimise inca
-                print("i= ", i)
-                print("posfirst= ", util.posfirst)
-                print("poslast= ", util.poslast)
+                # print("i= ", i)
+                # print("posfirst= ", util.posfirst)
+                # print("poslast= ", util.poslast)
                 if util.window[i].sending_time == 0 and util.window[i].rcv_ack == False:
                     util.window[i].sending_time = time.time()
                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
                     sock.sendto(mess+b'fisier', address)
                # time.sleep(1)
-        print("se trimite")
+                    print("se trimite")
     print("gata trimisul!")
