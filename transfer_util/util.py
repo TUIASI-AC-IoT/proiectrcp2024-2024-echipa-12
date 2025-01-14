@@ -75,7 +75,7 @@ packet_loss = .2
 
 #pentru primirea fisierelor
 rcv_buffer=[] # textul ce va trebui adaugat in fisierul nou
-buf_list_frame=[] #frame-urile care au fost primite dar nu au ajuns in ordinea buna
+last_frame_bf=-1
 
 
 #TODO: KNOWN ISSUES

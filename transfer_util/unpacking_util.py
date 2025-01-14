@@ -10,18 +10,10 @@ from transfer_util.sliding_window_2 import createBuffer, createWindow
 
 def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     type_flag = packet[0]
-    #---
-    print(util.rcv_buffer)
-    #---
     frame_no = struct.unpack('!H', packet[1:3])[0]
     cmd_id = struct.unpack('!c', packet[3:4])[0][0]
     if type_flag == util.ACK:
         data = None
-        print("---------------------")
-        #print(util.window[frame_no].sending_time)
-        #print(time.time())
-        print(util.window[frame_no].rcv_ack)
-        print("---------------------")
         util.window[frame_no].rcv_ack = True
         #print("AM PRIMIT ACK")
         # TODO: chestie fereastra glisanta
@@ -29,22 +21,15 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
     elif type_flag == util.FILE_CHUNK:
         data = struct.unpack(f'{len(packet) - 4}s', packet[4:])
         actionQ.put(f'a@f@{frame_no}') # send ack
-        # TODO: test------------------------
-        if(frame_no==len(util.rcv_buffer)):
-            util.rcv_buffer.append(data)
-            print("HAAAAAAAAA")
-        else:
-            while(len(util.rcv_buffer) in util.buf_list_frame[:][1]): #TODO: de verificat aici
-                poz = util.buf_list_frame.index(len(util.rcv_buffer))
-                util.rcv_buffer.append(util.buf_list_frame[poz][0])
-                util.rcv_buffer.append(data)
-                print("aici?")
-            else:
-                elem=[data,frame_no]
-                util.buf_list_frame.append(elem)
-                print("sau aici?")
 
-        #todo:test------------------------------
+        # creare buffer cu elementele transmise prin fereastra glisanta
+        if(frame_no>=util.last_frame_bf+1 and frame_no<=util.last_frame_bf+util.window_size):
+            util.rcv_buffer[frame_no] = data
+        while(util.rcv_buffer[util.last_frame_bf+1] is not None ):
+            #todo: and util.last_frame_bf+util.window_size<=numarul de elemente din bufferul trimis
+            util.last_frame_bf+=1
+        #---------
+
         # if frame_no == util.current_frame + 1:
         #     with open(util.path + data, 'ab') as file:
         #         pass
@@ -111,11 +96,9 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             #TODO: send to sliding window
           #  util.current_file = open(util.path + data, 'rb')
             print("=")
-            #todo: se poate incerca testarea lucrurilor ce urmeaza aici
-          #   util.rcv_buffer.clear() #curatarea bufferului pentru primire text
-          #   util.last_rcv=-1
-          #   util.buf_list_frame.clear()
-          #   print("REQ MADE")# pana aici
+            util.rcv_buffer=[None]*60 #TODO:FOARTE IMPORTANT: in loc de 40 o sa se puna nr de frame-uri ce vor veni
+            util.last_frame_bf = -1
+
            # util.current_file = open(data, 'wb')
            # sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
         actionQ.put(f'a@c@{cmd_id}')

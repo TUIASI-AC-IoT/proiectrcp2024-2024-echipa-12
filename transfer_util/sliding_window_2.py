@@ -95,4 +95,5 @@ def sw_send(sock, address: tuple[str, int]):
                     sock.sendto(mess+b'fisier', address)
                # time.sleep(1)
                     print("se trimite")
+    print(util.rcv_buffer)
     print("gata trimisul!")
