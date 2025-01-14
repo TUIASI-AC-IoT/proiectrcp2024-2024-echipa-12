@@ -25,9 +25,19 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         # creare buffer cu elementele transmise prin fereastra glisanta
         if(frame_no>=util.last_frame_bf+1 and frame_no<=util.last_frame_bf+util.window_size):
             util.rcv_buffer[frame_no] = data
-        while(util.rcv_buffer[util.last_frame_bf+1] is not None ):
+        while(util.last_frame_bf<util.rcv_buffer_size and util.rcv_buffer[util.last_frame_bf+1] is not None ):
             #todo: and util.last_frame_bf+util.window_size<=numarul de elemente din bufferul trimis
             util.last_frame_bf+=1
+        print(f"\n\n\n{frame_no, util.last_frame_bf, util.rcv_buffer_size}\n\n\n")
+        if util.rcv_buffer_size == util.last_frame_bf:
+            print("\n\n\t\t\t\tam scris\n\n")
+            with open(os.path.join(util.path, util.rcv_filename), 'wb') as file:
+                for i in util.rcv_buffer:
+                    file.write(i[0])
+                    #print(i[0])
+                    #print(type(i[0]))
+                file.write('\0')
+                file.close()
         #---------
 
         # if frame_no == util.current_frame + 1:
@@ -95,9 +105,11 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         elif cmd_id == util.UPLOAD_REQ:
             #TODO: send to sliding window
           #  util.current_file = open(util.path + data, 'rb')
-            print("=")
-            util.rcv_buffer=[None]*60 #TODO:FOARTE IMPORTANT: in loc de 40 o sa se puna nr de frame-uri ce vor veni
+            filename, filesize = data.split('@')
+            util.rcv_buffer=[None]*(int(filesize)) #TODO:FOARTE IMPORTANT: in loc de 40 o sa se puna nr de frame-uri ce vor veni
             util.last_frame_bf = -1
+            util.rcv_buffer_size = int(filesize)-1
+            util.rcv_filename = filename
 
            # util.current_file = open(data, 'wb')
            # sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda

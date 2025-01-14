@@ -76,10 +76,13 @@ packet_loss = .2
 #pentru primirea fisierelor
 rcv_buffer=[] # textul ce va trebui adaugat in fisierul nou
 last_frame_bf=-1
-
+rcv_buffer_size = 0
+rcv_filename = ''
 
 #TODO: KNOWN ISSUES
-# 1. Daca incerc sa sterg fisier nu merge
-# 2. Daca incerc sa sterg folder cu fisiere in el crapa
+# 1. Daca incerc sa sterg fisier nu merge           -rezolvat
+# 2. Daca incerc sa sterg folder cu fisiere in el crapa   -rezolvat
 # 3. Daca pui space cand dai new folder iti face pana la space (not a bug, a feature :)))  # rezolvare: punem " " la mkdir
-# 4. TO BE CONTINUED PROBABIL...
+# 4. Dimensiune maxima fisier pe care il pot trimite ~= 67MB
+# 5. TO BE CONTINUED PROBABIL...
+#

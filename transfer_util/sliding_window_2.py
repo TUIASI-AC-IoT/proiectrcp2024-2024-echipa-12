@@ -41,7 +41,7 @@ def timeout_fct():  # window -> lista de frame-uri
     for i in range(util.posfirst,util.poslast):
         if util.window[i].sending_time + timeout > time.time():
             return i  #trebuie retrimis
-            print("?")
+            #print("?")
     return -1  #nu trebuie retrimis niciun pachet
 
 
@@ -79,7 +79,7 @@ def sw_send(sock, address: tuple[str, int]):
         while to_elem != -1:  #atata timp cat exista o bucata de fisier in timeout va fi retrimisa
             util.window[to_elem].sending_time = time.time()
             mess = encoder.packing(util.FILE_CHUNK, to_elem, 0, util.window[to_elem].data)
-            sock.sendto(mess+b'fisier', address)
+            sock.sendto(mess, address)
             to_elem = timeout_fct()
             print("se trimite")
         slide_window()  #se muta fereastra daca este nevoie
@@ -92,8 +92,14 @@ def sw_send(sock, address: tuple[str, int]):
                 if util.window[i].sending_time == 0 and util.window[i].rcv_ack == False:
                     util.window[i].sending_time = time.time()
                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
-                    sock.sendto(mess+b'fisier', address)
+                    sock.sendto(mess, address)
                # time.sleep(1)
                     print("se trimite")
-    print(util.rcv_buffer)
-    print("gata trimisul!")
+   #  util.file_buffer = []
+   #  util.current_frame = 0
+   #  util.sending_buffer = []
+   #  util.file_to_transfer = ''
+   # # util.upload_flag = False
+   #  util.sent = []
+   #  util.window_position = 0
+   #  util.window = []

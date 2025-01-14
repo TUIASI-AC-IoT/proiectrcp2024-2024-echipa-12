@@ -1,3 +1,4 @@
+import math
 import queue
 import tkinter as tk
 import warnings
@@ -6,7 +7,7 @@ from transfer_util import util
 from transfer_util.util import uiupdateQ, actionQ
 import customtkinter as ctk
 from tkinter import filedialog
-
+import os
 
 def ui():
     warnings.filterwarnings("ignore", module="customtkinter.*")
@@ -228,7 +229,7 @@ def ui():
         fg_color='#191919',
         image=upload_icon,
         command= lambda: (
-                actionQ.put(f'c@up@{util.file_to_transfer}') if util.file_to_transfer else None,
+                actionQ.put(f'c@up@{os.path.basename(util.file_to_transfer)}@{math.ceil(os.path.getsize(util.file_to_transfer)/util.packet_data_size)}') if util.file_to_transfer else None,
         ),#lambda fp=filepath_textbox: take_file_path(fp),  # filename)),
         font=("Arial", 18),
         compound=ctk.LEFT,

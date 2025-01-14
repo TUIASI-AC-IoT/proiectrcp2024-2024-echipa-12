@@ -56,6 +56,8 @@ def send(address:[str, int], scket:socket) -> None:
                 elif cmd == "mkdir":
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.MKDIR, data)
                 elif cmd == "up":
+                    data = f'{msg[2]}@{msg[3]}'
+                    print(data)
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.UPLOAD_REQ, data)
                 # print("sending message...")
                 # print("am trimis mesajul", mess)
