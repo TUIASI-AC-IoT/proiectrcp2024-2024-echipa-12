@@ -1,9 +1,9 @@
 from transfer_util import encoder
 import time
-from transfer_util import util
+from transfer_util import util as util
 import random as rand
 
-timeout = 2
+#til.timeout = 2
 
 class frame:
     def __init__(self):
@@ -46,11 +46,11 @@ def createWindow():
 def timeout_fct():  # window -> lista de frame-uri
     lista=[]
     for i in range(util.posfirst,util.poslast):
-        if util.window[i].sending_time + timeout <= time.time() and util.window[i].rcv_ack == False:
+        if util.window[i].sending_time + util.timeout <= time.time() and util.window[i].rcv_ack == False:
             print("-----")
             print(time.time())
             print(util.window[i].sending_time,"\n")
-            print(util.window[i].sending_time+timeout,"\n")
+            print(util.window[i].sending_time+util.timeout,"\n")
             print("---------")
             lista.append(i)  #trebuie retrimis
 

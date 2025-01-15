@@ -23,6 +23,7 @@ MKDIR = 0b0000_0011 #DATA = folder_name
 RM_RMDIR = 0b0000_0100 #DATA = folder_name/file_name
 MOVE     = 0b0000_0101 #DATA = path1, path2
 TOUCH     = 0b0000_0110 #DATA = name
+CHG_SETTING = 0b0000_1001 # DATA = 'setting@value' @ separator
 
 LS       = 0b0000_0001 #astea au output
 DOWNLOAD_REQ = 0b0000_0111 #file_name
@@ -38,18 +39,6 @@ filechunkQ = queue.Queue()
 uiupdateQ = queue.Queue()
 
 timeout = 2.5 # secunde
-packetloss = 20 # %
-
-class FileChunk:
-    def __init__(self, frame_no, data):
-        self.frame_no = frame_no
-        self.data = data
-
-class Ack:
-    def __init__(self, ack_type, cmd_id, data=None):
-        self.ack_type = ack_type
-        self.cmd_id = cmd_id
-        self.data = data
 
 file_buffer = []
 current_frame = 0
@@ -68,7 +57,7 @@ posfirst=0
 poslast=posfirst+window_size-1
 
 #OTHER SETTINGS
-packet_loss = .2
+packet_loss = 70
 
 #pentru primirea fisierelor
 rcv_buffer = [] # textul ce va trebui adaugat in fisierul nou

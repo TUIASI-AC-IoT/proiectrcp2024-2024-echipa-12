@@ -1,3 +1,4 @@
+import math
 import subprocess
 import os, struct, socket
 import time
@@ -41,7 +42,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
                     #print(type(i[0]))
                 #file.write('\0')
                 file.close()
-            print("am scris")
+            print("am scris", os.path.join(util.path, util.rcv_filename))
         #---------
 
         # if frame_no == util.current_frame + 1:
@@ -56,6 +57,7 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
         #print("AM PRIMIT ACK CMD!")
         if cmd_id == util.UPLOAD_REQ:
             util.window_position = 0
+            print("filetotransfer: uploadreq: ", util.file_to_transfer)
             util.sending_buffer = createBuffer(util.file_to_transfer)
             createWindow()
             actionQ.put('f')
@@ -102,23 +104,41 @@ def unpack(packet: bytes, sock:socket.socket, address:tuple[str, int]):
             with open(util.path + data, 'w') as file:
                 pass
         elif cmd_id == util.DOWNLOAD_REQ:
-            with open(util.path + data, 'w') as file:
-                pass
-            util.current_frame = 0
+            size = os.path.getsize(os.path.join(util.path, data))
+            size = math.ceil(os.path.getsize(data) / util.packet_data_size)
+            actionQ.put(f'c@up@{data}@{size}')
+            util.file_to_transfer = os.path.join(util.path, data)
+            print(f"primit downladreq: {util.file_to_transfer}")
+            # filename, filesize = data.split('@')
+            # util.rcv_buffer = [None] * (int(filesize))
+            # util.last_frame_bf = -1
+            # util.rcv_buffer_size = int(filesize) - 1
+            # util.rcv_filename = filename
+            # with open(util.path + data, 'w') as file:
+            #     pass
+            # util.current_frame = 0
             # TODO: send to sliding window
-            pass
         elif cmd_id == util.UPLOAD_REQ:
             #TODO: send to sliding window
           #  util.current_file = open(util.path + data, 'rb')
             filename, filesize = data.split('@')
-            util.rcv_buffer=[None]*(int(filesize)) #TODO:FOARTE IMPORTANT: in loc de 40 o sa se puna nr de frame-uri ce vor veni
+            util.rcv_buffer=[None]*(int(filesize))
             util.last_frame_bf = -1
             util.rcv_buffer_size = int(filesize)-1
             util.rcv_filename = filename
-
+        elif cmd_id == util.CHG_SETTING:
+            setting, value = data.split('@')
+            if setting == 'packetloss':
+                util.packet_loss = int(value)
+                print(util.packet_loss)
+            elif setting == 'window_size':
+                util.window_size = int(value)
+            elif setting == 'timeout':
+                util.timeout = float(value)
            # util.current_file = open(data, 'wb')
            # sock.sendto(packing(util.ACK, 0, cmd_id, None), address)  # Trimite ACK pt comanda
-        actionQ.put(f'a@c@{cmd_id}')
+        if cmd_id != util.DOWNLOAD_REQ:
+            actionQ.put(f'a@c@{cmd_id}')
     elif type_flag == util.COMMAND_NO_PARAMS:
         if cmd_id == util.LS:
             #command = f'DIR /B {util.path}'

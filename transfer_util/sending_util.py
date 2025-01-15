@@ -20,6 +20,7 @@ def send(address:[str, int], scket:socket) -> None:
         #message = actionQ.get()
         if message != "":
             msg = message.split("@")
+            print(msg)
             #msg[0] va fi tipul pachetului:
             #         - f = file
             #         - a = ack
@@ -55,9 +56,16 @@ def send(address:[str, int], scket:socket) -> None:
                 elif cmd == "mkdir":
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.MKDIR, data)
                 elif cmd == "up":
-                    data = f'{msg[2]}@{msg[3]}'
+                    data = f'{msg[2]}@{msg[3]}'#FILENAME, SIZE
                     print(data)
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.UPLOAD_REQ, data)
+                elif cmd == "down":
+                    data = msg[2] #filename
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.DOWNLOAD_REQ, data)
+                elif cmd == "cs":
+                    data = f'{msg[2]}@{msg[3]}'
+                    mess = encoder.packing(util.COMMAND_W_PARAMS, 0, util.CHG_SETTING, data)
+                    print("cs")
                 # print("sending message...")
                 # print("am trimis mesajul", mess)
                 # scket.sendto(mess, address)
@@ -66,5 +74,5 @@ def send(address:[str, int], scket:socket) -> None:
             #     mess = encoder.packing(ACK_COMMAND, 0, command_id=util.ACK, data=msg[1])
             if mess != "":
                # print("sending message...")
-               # print("am trimis mesajul", mess)
+                print("am trimis mesajul", mess)
                 scket.sendto(mess, address)
