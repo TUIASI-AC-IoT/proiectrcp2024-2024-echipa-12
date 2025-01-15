@@ -11,7 +11,6 @@ from transfer_util.util import actionQ
 
 def send(address:[str, int], scket:socket) -> None:
     while True:
-
         message = ""
         try:
             message = util.actionQ.get()

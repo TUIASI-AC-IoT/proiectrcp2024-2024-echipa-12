@@ -71,11 +71,14 @@ poslast=posfirst+window_size-1
 packet_loss = .2
 
 #pentru primirea fisierelor
-rcv_buffer=[] # textul ce va trebui adaugat in fisierul nou
-last_frame_bf=-1
+rcv_buffer = [] # textul ce va trebui adaugat in fisierul nou
+last_frame_bf = -1
 rcv_buffer_size = 0
 rcv_filename = ''
 
+
+#pentru pierderea pachetelor
+client_pack_loss_percentage = 0
 #TODO: KNOWN ISSUES
 # 1. Daca incerc sa sterg fisier nu merge           -rezolvat
 # 2. Daca incerc sa sterg folder cu fisiere in el crapa   -rezolvat

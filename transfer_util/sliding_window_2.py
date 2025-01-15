@@ -1,9 +1,9 @@
 from transfer_util import encoder
 import time
 from transfer_util import util
+import random as rand
 
-
-timeout = 10
+timeout = 2
 
 class frame:
     def __init__(self):
@@ -37,12 +37,25 @@ def createWindow():
         frm.rcv_ack = False
         util.window.append(frm)
 
+# def timeout_fct():  # window -> lista de frame-uri
+#     for i in range(util.posfirst,util.poslast):
+#         if util.window[i].sending_time + timeout > time.time() and util.window[i].rcv_ack == False:
+#             return i  #trebuie retrimis
+#     return -1  #nu trebuie retrimis niciun pachet
+
 def timeout_fct():  # window -> lista de frame-uri
+    lista=[]
     for i in range(util.posfirst,util.poslast):
-        if util.window[i].sending_time + timeout > time.time():
-            return i  #trebuie retrimis
-            #print("?")
-    return -1  #nu trebuie retrimis niciun pachet
+        if util.window[i].sending_time + timeout <= time.time() and util.window[i].rcv_ack == False:
+            print("-----")
+            print(time.time())
+            print(util.window[i].sending_time,"\n")
+            print(util.window[i].sending_time+timeout,"\n")
+            print("---------")
+            lista.append(i)  #trebuie retrimis
+
+
+    return lista  #nu trebuie retrimis niciun pachet
 
 
 def move_list_one_pos_right():
@@ -73,34 +86,68 @@ def something_to_send():
             return True
     return False
 
+# def sw_send(sock, address: tuple[str, int]):
+#     to_elem=timeout_fct()
+#     while util.window_size <= util.poslast+1 - util.posfirst or to_elem != -1: #inca mai sunt elemente de parcurs sau avem un element in timeout
+#         to_elem = timeout_fct()
+#         while to_elem != -1:  #atata timp cat exista o bucata de fisier in timeout va fi retrimisa
+#             util.window[to_elem].sending_time = time.time()
+#             mess = encoder.packing(util.FILE_CHUNK, to_elem, 0, util.window[to_elem].data)
+#             if(rand.randint(0,100)>util.client_pack_loss_percentage):
+#                 sock.sendto(mess, address)
+#             else:
+#                 print("TEAPA, NU S-O TRIMIS")
+#             to_elem = timeout_fct()
+#             print(to_elem)
+#
+#         slide_window()  #se muta fereastra daca este nevoie
+#
+#         if something_to_send() == True:
+#             for i in range(util.posfirst, util.poslast+1):  #se cauta elemente care nu au fost trimise inca
+#                 if util.window[i].sending_time == 0 and util.window[i].rcv_ack == False:
+#                     util.window[i].sending_time = time.time()
+#                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
+#                     if (rand.randint(0, 100) > util.client_pack_loss_percentage):
+#                         sock.sendto(mess, address)
+#                     else:
+#                         print("TEAPA, NU S-O TRIMIS")
+#                # time.sleep(1)
+#                     #print("se trimite")
+#     print("gata trimisul")
+#
+#
+
 def sw_send(sock, address: tuple[str, int]):
+    to_elem=[]
     to_elem=timeout_fct()
-    while util.window_size <= util.poslast+1 - util.posfirst or to_elem != -1: #inca mai sunt elemente de parcurs sau avem un element in timeout
-        while to_elem != -1:  #atata timp cat exista o bucata de fisier in timeout va fi retrimisa
-            util.window[to_elem].sending_time = time.time()
-            mess = encoder.packing(util.FILE_CHUNK, to_elem, 0, util.window[to_elem].data)
-            sock.sendto(mess, address)
-            to_elem = timeout_fct()
-            #print("se trimite")
+    while util.window_size <= util.poslast+1 - util.posfirst or len(to_elem) != 0: #inca mai sunt elemente de parcurs sau avem un element in timeout
+        to_elem = []
+        to_elem = timeout_fct()
+
+        if len(to_elem) != 0:  #daca exista o bucata de fisier in timeout va fi retrimisa
+            for i in range(0,len(to_elem)):
+                print(to_elem,"\n")
+                util.window[to_elem[i]].sending_time = time.time()
+                mess = encoder.packing(util.FILE_CHUNK, to_elem[i], 0, util.window[to_elem[i]].data)
+                if(rand.randint(0,100)>util.client_pack_loss_percentage):
+                    sock.sendto(mess, address)
+                else:
+                    print("TEAPA, NU S-O TRIMIS")
+
         slide_window()  #se muta fereastra daca este nevoie
 
         if something_to_send() == True:
             for i in range(util.posfirst, util.poslast+1):  #se cauta elemente care nu au fost trimise inca
-                # print("i= ", i)
-                # print("posfirst= ", util.posfirst)
-                # print("poslast= ", util.poslast)
                 if util.window[i].sending_time == 0 and util.window[i].rcv_ack == False:
                     util.window[i].sending_time = time.time()
                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
-                    sock.sendto(mess, address)
+                    if (rand.randint(0, 100) > util.client_pack_loss_percentage):
+                        sock.sendto(mess, address)
+                    else:
+                        print("TEAPA, NU S-O TRIMIS")
                # time.sleep(1)
                     #print("se trimite")
+        to_elem = []
+        to_elem = timeout_fct()
     print("gata trimisul")
-   #  util.file_buffer = []
-   #  util.current_frame = 0
-   #  util.sending_buffer = []
-   #  util.file_to_transfer = ''
-   # # util.upload_flag = False
-   #  util.sent = []
-   #  util.window_position = 0
-   #  util.window = []
+   

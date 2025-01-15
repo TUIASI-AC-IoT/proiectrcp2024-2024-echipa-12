@@ -249,6 +249,26 @@ def ui():
     )
     btn_upload.place(x=1015, y=500)
 
+    #packlost %
+    def update_pack_loss(value):
+        util.client_pack_loss_percentage = float(value)
+
+    title_slider = ctk.CTkLabel(root, text="Packet Loss Percentage Client:", font=("Arial", 18))
+    title_slider.place(x=30, y=552)
+    var = tk.IntVar()
+    packloss=ctk.CTkSlider(
+        root,
+        from_=0,
+        to=100,
+        number_of_steps=10,
+        orientation=ctk.HORIZONTAL,
+        variable = var,
+        command=update_pack_loss
+    )
+
+    packloss.place(x=320,y=560)
+    slider_val = ctk.CTkLabel(root, textvariable=var, font=("Arial", 18))
+    slider_val.place(x=290,y=553)
     # ===============
 
     folder_icon = tk.PhotoImage(file='icons/folders2.png')
