@@ -25,7 +25,7 @@ def createBuffer(file_name: str):
         i += 1
         chunk = f.read(dim)
     f.close()
-    print("dim buffer: ", len(buffer))
+    #print("dim buffer: ", len(buffer))
     return buffer
 
 def createWindow():
@@ -51,7 +51,7 @@ def move_list_one_pos_right():
         mutat = 1
         util.posfirst +=1
         util.poslast += 1
-        print("s-a mutat")
+        #print("s-a mutat")
     elif util.posfirst < util.poslast:
         util.posfirst += 1
     return mutat #mutat=0 -> nu se mai poate muta fereastra
@@ -81,7 +81,7 @@ def sw_send(sock, address: tuple[str, int]):
             mess = encoder.packing(util.FILE_CHUNK, to_elem, 0, util.window[to_elem].data)
             sock.sendto(mess, address)
             to_elem = timeout_fct()
-            print("se trimite")
+            #print("se trimite")
         slide_window()  #se muta fereastra daca este nevoie
 
         if something_to_send() == True:
@@ -94,7 +94,8 @@ def sw_send(sock, address: tuple[str, int]):
                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
                     sock.sendto(mess, address)
                # time.sleep(1)
-                    print("se trimite")
+                    #print("se trimite")
+    print("gata trimisul")
    #  util.file_buffer = []
    #  util.current_frame = 0
    #  util.sending_buffer = []

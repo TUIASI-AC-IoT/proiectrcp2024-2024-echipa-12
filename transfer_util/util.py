@@ -53,15 +53,12 @@ class Ack:
 
 file_buffer = []
 current_frame = 0
-sending_buffer = []
-file_to_transfer = ''
+sending_buffer = [] #da
+file_to_transfer = '' #da
 upload_flag = False
 sent = []
 window_position = 0
 window = []
-
-#semaphore for sliding window
-smphr_sending_file=False
 
 #SLIDING WINDOW SETTINGS
 window_size = 5
@@ -82,7 +79,7 @@ rcv_filename = ''
 #TODO: KNOWN ISSUES
 # 1. Daca incerc sa sterg fisier nu merge           -rezolvat
 # 2. Daca incerc sa sterg folder cu fisiere in el crapa   -rezolvat
-# 3. Daca pui space cand dai new folder iti face pana la space (not a bug, a feature :)))  # rezolvare: punem " " la mkdir
-# 4. Dimensiune maxima fisier pe care il pot trimite ~= 67MB
+# 3. Daca pui space cand dai new folder iti face pana la space (not a bug, a feature :)))  # rezolvare: punem " " la mkdir - rezolvat(cred?)
+# 4. Dimensiune maxima fisier pe care il pot trimite ~= 67MB -rezolvat
 # 5. TO BE CONTINUED PROBABIL...
 #

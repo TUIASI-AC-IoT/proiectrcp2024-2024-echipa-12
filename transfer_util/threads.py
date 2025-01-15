@@ -37,8 +37,8 @@ def send_packet(udp_ip, udp_port, scket):
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, command_id=util.MKDIR, data=msg[1])
                 elif(msg[0] == "up"):
                     mess = encoder.packing(util.COMMAND_W_PARAMS, 0, command_id=util.UPLOAD_REQ, data=msg[1])
-                print("sending message...")
-                print("am trimis mesajul", mess)
+               # print("sending message...")
+                #print("am trimis mesajul", mess)
                 scket.sendto(mess, (udp_ip, udp_port))
                 message = ""
                 #frame_number+=1

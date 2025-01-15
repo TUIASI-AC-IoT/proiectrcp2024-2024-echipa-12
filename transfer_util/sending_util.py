@@ -66,6 +66,6 @@ def send(address:[str, int], scket:socket) -> None:
             # elif (msg[0] == "ack"):
             #     mess = encoder.packing(ACK_COMMAND, 0, command_id=util.ACK, data=msg[1])
             if mess != "":
-                print("sending message...")
-                print("am trimis mesajul", mess)
+               # print("sending message...")
+               # print("am trimis mesajul", mess)
                 scket.sendto(mess, address)

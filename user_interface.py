@@ -43,9 +43,17 @@ def ui():
             for i in data:
                 if i != "":
                     if 'File: ' in i:
-                        files.append(i.split('File: ')[1])
+                        try:
+                            files.append(i.split('File: ')[1])
+                        except IndexError:
+                            files = []
                     else:
-                        folders.append(i.split('Folder: ')[1])
+                        try:
+                            folders.append(i.split('Folder: ')[1])
+                        except IndexError:
+                            files = []
+            print(files)
+            print(folders)
             j=1
             for i in folders:
                 j=j+1
