@@ -1,7 +1,9 @@
+import queue
 import socket as sc
 import threading as Thread
 from transfer_util import threads, util, sending_util
 import user_interface
+from transfer_util.sliding_window_2 import sw_send
 
 def main():
     scket = sc.socket(sc.AF_INET,
@@ -19,8 +21,6 @@ def main():
     #ui_thread.start()
     receiver_thread.start()
     user_interface.ui()
-
-
 
     #ui_thread.join()
     print("shutting down...")

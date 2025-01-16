@@ -5,7 +5,7 @@ import time
 import shutil
 import transfer_util.util as util
 from transfer_util.encoder import packing
-from transfer_util.util import uiupdateQ, actionQ
+from transfer_util.util import uiupdateQ, actionQ, rcv_buffer
 from transfer_util.sliding_window_2 import createBuffer, createWindow
 
 
@@ -21,6 +21,11 @@ def unpack(packet: bytes):
         data = struct.unpack(f'{len(packet) - 6}s', packet[6:])
         print("Am primit FILECHUNK cu FRAME NUMBER: ", frame_no)
         actionQ.put(f'a@f@{frame_no}') # send ack
+        highest_ack = 0
+        for i in range(len(rcv_buffer) - 1, -1, -1):
+            if rcv_buffer[i] is not None:
+                highest_ack = i
+                break
         #fisier mai mic ca dimensiunea ferestrei
         if frame_no>=util.last_frame_bf+1 and util.window_size > util.rcv_buffer_size:
             util.rcv_buffer[frame_no] = data
@@ -165,7 +170,6 @@ def client_unpack(packet:bytes):
         data = None
         util.window[frame_no].rcv_ack = True
         util.progressQ.put((frame_no+1)/len(util.sending_buffer))
-        print("frameno: ", frame_no+1, "send: ", len(util.sending_buffer))
         if frame_no == len(util.sending_buffer)-1:
             util.sending_flag = 0
         # TODO: chestie fereastra glisanta
@@ -173,6 +177,7 @@ def client_unpack(packet:bytes):
     elif type_flag == util.FILE_CHUNK:
         data = struct.unpack(f'{len(packet) - 6}s', packet[6:])
         print("Am primit FILECHUNK cu FRAME NUMBER: ", frame_no)
+
         actionQ.put(f'a@f@{frame_no}') # send ack
 
         #fisier mai mic ca dimensiunea ferestrei
@@ -184,6 +189,7 @@ def client_unpack(packet:bytes):
         while(util.last_frame_bf<util.rcv_buffer_size and util.rcv_buffer[util.last_frame_bf+1] is not None ):
              #todo: and util.last_frame_bf+util.window_size<=numarul de elemente din bufferul trimis
             util.last_frame_bf+=1
+        util.progressQ.put(util.last_frame_bf / len(util.rcv_buffer))
         #print(f"\n\n\n{frame_no, util.last_frame_bf, util.rcv_buffer_size}\n\n\n")
         if util.rcv_buffer_size == util.last_frame_bf:
          #   print("\n\n\t\t\t\tam scris\n\n")
@@ -193,7 +199,9 @@ def client_unpack(packet:bytes):
                     #print(i[0])
                     #print(type(i[0]))
                 #file.write('\0')
+                util.sending_flag = 0
                 file.close()
+
             util.rcv_buffer = []
             util.last_frame_bf = -1
             util.rcv_buffer_size = 0
@@ -239,5 +247,6 @@ def client_unpack(packet:bytes):
             util.last_frame_bf = -1
             util.rcv_buffer_size = int(filesize)-1
             util.rcv_filename = filename
+            util.sending_flag = 2
         actionQ.put(f'a@c@{cmd_id}')
 

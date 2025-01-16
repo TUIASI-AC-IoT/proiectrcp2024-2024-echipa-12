@@ -19,26 +19,36 @@ download_icon = None
 def ui():
     def get_savelocation():
         util.path = f"{filedialog.askdirectory(initialdir='./', title='Where do you want to save the file?')}"
-    # def update_progressbar():
-    #     while True:
-    #         if util.sending_flag:
-    #             progressbar.place(x=615, y=600)
-    #             try:
-    #                 progress = util.progressQ.get_nowait()
-    #                 progressbar.set(progress)
-    #                 print(progress)
-    #                 progress_title.configure(text=f"{progress:.0f}%")
-    #             except queue.Empty:
-    #                 pass
-    #         else:
-    #             progressbar.place_forget()
-    #             progress_title.configure(text="")
+    def update_progressbar():
+        if util.sending_flag == 1:
+            progressbar.place(x=615, y=600)
+            try:
+                progress = util.progressQ.get_nowait()
+                progressbar.set(progress)
+               # print(progress)
+                progress_title.configure(text=f"UPLOAD PROGRESS {progress*100:.0f}%")
+            except queue.Empty:
+                pass
+        elif util.sending_flag == 2:
+            progressbar.place(x=615, y=600)
+            try:
+                progress = util.progressQ.get_nowait()
+                progressbar.set(progress)
+                # print(progress)
+                progress_title.configure(text=f"DOWNLOAD PROGRESS {progress * 100:.0f}%")
+            except queue.Empty:
+                pass
+        elif util.sending_flag == 0:
+            #progressbar.place_forget()
+            progress_title.configure(text="No Transfer")
+            progressbar.set(0)
 
-            #root.after(100, update_progressbar)
+        root.after(50, update_progressbar)
 
     warnings.filterwarnings("ignore", module="customtkinter.*")
     global file_to_transfer
     def updateUI(folder_icon, file_icon,delete_item_icon,download_icon):
+
         for widget in fileframe.winfo_children():
             widget.destroy()
         actionQ.put('c@ls')
@@ -78,8 +88,8 @@ def ui():
                             folders.append(i.split('Folder: ')[1])
                         except IndexError:
                             files = []
-            print(files)
-            print(folders)
+            # print(files)
+            # print(folders)
             j=1
             for i in folders:
                 j=j+1
@@ -231,9 +241,7 @@ def ui():
     btn_new_file.place(x=30, y=500) # E FOLDEEEEEEEEEEEEEER
 
     #======= upload buttons
-    upload_icon = tk.PhotoImage(
-        file='icons/upload_icon.png')  # https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
-
+    upload_icon = tk.PhotoImage(file='icons/upload_icon.png')  # https://www.veryicon.com/icons/miscellaneous/general-icon-12/upload-upload-4.html
     filepath_textbox = ctk.CTkTextbox(root, width=300, height=32, fg_color='#383838', font=("Arial", 18))
     filepath_textbox.place(x=750, y=500)
     filepath_textbox.insert("0.0", " ")
@@ -359,24 +367,37 @@ def ui():
     slider_val3 = ctk.CTkLabel(root, textvariable=var3, font=("Arial", 18))
     slider_val3.place(x=290, y=613)
     # ===============
-    global folder_icon, file_icon, delete_item_icon, download_icon
+    # global folder_icon, file_icon, delete_item_icon, download_icon
     folder_icon = tk.PhotoImage(file='icons/folders2.png')
     file_icon = tk.PhotoImage(file='icons/files.png')#https://www.pngwing.com/en/free-png-mflca
     delete_item_icon = tk.PhotoImage(file='icons/remove.png') #
     download_icon = tk.PhotoImage(file='icons/download.png') #https://www.veryicon.com/icons/miscellaneous/general-icon-12/download-download-3.html
 
     #PROGRESSBAR
-    # progress_title = ctk.CTkLabel(root, text="", font=("Arial", 18))
-    # progress_title.place(x=615, y=575)
-    # progressbar = ctk.CTkProgressBar(master=root)
-    # progressbar.set(0)
-
+    progress_title = ctk.CTkLabel(
+        root,
+        text="Progress",
+        font=("Arial", 18)
+    )
+    progress_title.place(x=615, y=575)
+    progressbar = ctk.CTkProgressBar(
+        master=root,
+        height=15,
+        width=505,
+        corner_radius=0,
+        fg_color='#383838',
+        progress_color='#FFFFFF'
+    )
+    progressbar.set(0)
+    progressbar.place(x=615, y=600)
     # ================
     updateUI(folder_icon, file_icon,delete_item_icon,download_icon)
+    update_progressbar()
+
     # update_progressbar()
 
-    #thread = threading.Thread(target=update_progressbar)
-    #thread.start()
+    # thread = threading.Thread(target=update_progressbar)
+    # thread.start()
 
     def closing_cbk(root): #https://stackoverflow.com/questions/71992792/tkinter-based-app-keeps-running-in-the-background-if-the-window-is-closed-abrupt
         print("closing tkinter")

@@ -17,7 +17,7 @@ def send(address:[str, int], scket:socket) -> None:
             break
         message = ""
         try:
-            message = util.actionQ.get(timeout=1.0)
+            message = util.actionQ.get(timeout=1.0)#timeout=1.0
         except queue.Empty:
             #print("Queue is empty")
             message = ""
@@ -36,9 +36,10 @@ def send(address:[str, int], scket:socket) -> None:
             if msg[0] == "f":
                 fereastra = threading.Thread(target=sw_send, args=(scket,address), daemon=True)
                 fereastra.start()
+                # print("pun in coada")
+                # util.slideQ.put(1)
                 mess = ''
-                #fereastra.join()
-                print("fereastra e gata!")
+                #print("fereastra e gata!")
             elif msg[0] == "a":
                 ack_type = msg[1]
                 if ack_type == "c": #command

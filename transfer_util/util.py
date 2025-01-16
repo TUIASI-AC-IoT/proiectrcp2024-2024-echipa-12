@@ -40,7 +40,6 @@ filechunkQ = queue.Queue()
 uiupdateQ = queue.Queue()
 progressQ = queue.Queue()
 
-
 sending_buffer = [] #da
 file_to_transfer = '' #da
 window = []
@@ -65,8 +64,6 @@ shutdown_event = Thread.Event()
 
 sending_flag = 0
 
-#pentru pierderea pachetelor
-client_pack_loss_percentage = 0
 #TODO: KNOWN ISSUES
 # 1. Daca incerc sa sterg fisier nu merge           -rezolvat
 # 2. Daca incerc sa sterg folder cu fisiere in el crapa   -rezolvat
