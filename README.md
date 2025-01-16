@@ -1,3 +1,5 @@
+
+
 # Controlul fluxului prin intermediul unui protocol cu fereastră glisantă.
 ## Prezentare noțiuni teoretice
 ### • Protocolul UDP (User Datagram Protocol)
@@ -91,7 +93,7 @@ Pachetul este unitatea de bază a transferului de informație.
 | TYPE FLAG |  FRAME NUMBER  | COMMAND ID |          DATA             |
 +-----------+----------------+------------+---------------------------+
 \          / \              / \          / \                         /
-  1 octet       2 octeți        1 octet      număr variabil de octeți
+  1 octet       4 octeți        1 octet      număr variabil de octeți
 ```
 ```
 +-----------+-------------------+----------------+------------+-----------------------------------------+ 
@@ -114,24 +116,30 @@ Pachetul este unitatea de bază a transferului de informație.
 :.............................................................:.........................................:
 ```
 ```
-+------------+------------+-----------------------------------------+
-| COMMAND ID |   COMMAND  |             PARAMETERS                  |
-+------------+------------+-----------------------------------------+
-|  0000 0001 |     ls     |                NONE                     |
-+------------+------------+-----------------------------------------+
-|  0000 0010 |     cd     |                path                     |
-+------------+------------+-----------------------------------------+
-|  0000 0011 |   mkdir    |             folder name                 |
-+------------+------------+-----------------------------------------+
-|  0000 0100 |  rm/rmdir  |          folder/file name               |
-+------------+------------+-----------------------------------------+
-|  0000 0101 |    move    |           src path dest path            |
-+------------+------------+-----------------------------------------+
++------------+------------------+-------------------------------------+
+| COMMAND ID |      COMMAND     |             PARAMETERS              |
++------------+------------------+-------------------------------------+
+|  0000 0001 |       ls         |                NONE                 |
++------------+------------------+-------------------------------------+
+|  0000 0010 |       cd         |                path                 |
++------------+------------------+-------------------------------------+
+|  0000 0011 |       mkdir      |             folder name             |
++------------+------------------+-------------------------------------+
+|  0000 0100 |     rm/rmdir     |          folder/file name           |
++------------+------------------+-------------------------------------+
+|  0000 0101 |       move       |         src path, dest path         |
++------------+------------------+-------------------------------------+
+|  0000 0101 |   chg_setting    |         setting name, value         |
++------------+------------------+-------------------------------------+
+|  0000 0101 |   download_req   |              file name              |
++------------+------------------+-------------------------------------+
+|  0000 0101 |   upload_req     |      file name, file dimension      |
++------------+------------------+-------------------------------------+
 ```
 ### Thread-uri
 - Server : 3 thread-uri(1 send, 1 receive, 1 prelucrare);
-- Client : 4 thread-uri(1 user interface, 1 send, 1 receive, 1 prelucrare).
-  
+- Client : 4 thread-uri(1 user interface, 1 send, 1 receive, 1 prelucrare);
+- Fereastră Glisantă : 2 thread-uri(create la cerere de server și client).
 
 ![image](https://hackmd.io/_uploads/SyGJPNiWJg.png)
 
