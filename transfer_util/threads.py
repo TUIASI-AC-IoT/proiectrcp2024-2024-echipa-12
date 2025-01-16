@@ -1,12 +1,14 @@
 import socket as sc
 import threading as Thread
 from time import sleep
-from transfer_util.unpacking_util import unpack
+from transfer_util.unpacking_util import client_unpack
 import transfer_util.encoder as encoder
 import transfer_util.util as util
+from transfer_util.util import timeout
 
 lock = Thread.Lock()
-new_message_event = Thread.Event()
+# new_message_event = Thread.Event()
+
 
 def send_packet(udp_ip, udp_port, scket):
     #frame_number=0
@@ -79,10 +81,16 @@ def make_message():
         sleep(3)
 
 def receive_packet(udp_ip, udp_port, scket:sc.socket):
+    scket.settimeout(1.0)
     while True:
+        if util.shutdown_event.is_set():
+            print("oprim recieve")
+            break
         try:
             pct, addr = scket.recvfrom(1034)
-            unpack(pct, scket, (udp_ip, udp_port))
+            client_unpack(pct)
+        except sc.timeout:
+            continue
         except ConnectionResetError as e:
             print(f"ConnectionResetError: {e}. Server might be offline")
         except Exception as e:

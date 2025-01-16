@@ -5,14 +5,13 @@ from transfer_util import util, unpacking_util as up
 import transfer_util.sending_util as sending_util
 from transfer_util.util import client_ip, client_port
 
-
 def send():#q, s, socket, address):
     pass
 
 def rcv(q, s, sock, address):
     while True:
         data, addr = sock.recvfrom(1035)
-        a = up.unpack(data, sock, address)
+        a = up.unpack(data)
         #print("AM PRIMIT UN MESAJ %s: " % data)
         #print("de la:", addr)
 

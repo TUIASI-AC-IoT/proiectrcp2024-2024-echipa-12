@@ -1,5 +1,6 @@
 import os
 import queue
+import threading as Thread
 
 server_ip = "localhost"
 #server_ip = "192.168.190.252"
@@ -37,22 +38,17 @@ actionQ = queue.Queue()
 ackQ = queue.Queue()
 filechunkQ = queue.Queue()
 uiupdateQ = queue.Queue()
+progressQ = queue.Queue()
 
-timeout = 2.5 # secunde
 
-file_buffer = []
-current_frame = 0
 sending_buffer = [] #da
 file_to_transfer = '' #da
-upload_flag = False
-sent = []
-window_position = 0
 window = []
 
 #SLIDING WINDOW SETTINGS
 window_size = 5
 packet_data_size = 1024
-timeout_duration = 1 #secunde
+timeout = 2.5 # secunde
 posfirst=0
 poslast=posfirst+window_size-1
 
@@ -60,11 +56,14 @@ poslast=posfirst+window_size-1
 packet_loss = 70
 
 #pentru primirea fisierelor
-rcv_buffer = [] # textul ce va trebui adaugat in fisierul nou
+rcv_buffer = []
 last_frame_bf = -1
 rcv_buffer_size = 0
 rcv_filename = ''
 
+shutdown_event = Thread.Event()
+
+sending_flag = 0
 
 #pentru pierderea pachetelor
 client_pack_loss_percentage = 0

@@ -1,3 +1,5 @@
+import os
+
 from transfer_util import encoder
 import time
 from transfer_util import util as util
@@ -15,6 +17,7 @@ class frame:
 
 def createBuffer(file_name: str):
     dim = util.packet_data_size  #nr octeti data
+    filesize = os.path.getsize(file_name)
     f = open(file_name, "rb")
     chunk = f.read(dim)
     buffer = []
@@ -32,7 +35,7 @@ def createWindow():
     cnt = 0
     for i in util.sending_buffer:
         frm=frame()
-        frm.data=i;
+        frm.data=i
         frm.sending_time = 0
         frm.rcv_ack = False
         util.window.append(frm)
@@ -45,16 +48,14 @@ def createWindow():
 
 def timeout_fct():  # window -> lista de frame-uri
     lista=[]
-    for i in range(util.posfirst,util.poslast):
+    for i in range(util.posfirst,util.poslast+1):
         if util.window[i].sending_time + util.timeout <= time.time() and util.window[i].rcv_ack == False:
-            print("-----")
-            print(time.time())
-            print(util.window[i].sending_time,"\n")
-            print(util.window[i].sending_time+util.timeout,"\n")
-            print("---------")
+            # print("-----")
+            # print(time.time())
+            # print(util.window[i].sending_time,"\n")
+            # print(util.window[i].sending_time+util.timeout,"\n")
+            # print("---------")
             lista.append(i)  #trebuie retrimis
-
-
     return lista  #nu trebuie retrimis niciun pachet
 
 
@@ -117,22 +118,33 @@ def something_to_send():
 #
 #
 
+
+
 def sw_send(sock, address: tuple[str, int]):
     to_elem=[]
     to_elem=timeout_fct()
-    while util.window_size <= util.poslast+1 - util.posfirst or len(to_elem) != 0: #inca mai sunt elemente de parcurs sau avem un element in timeout
+    #print(util.window_size, "< ws, ", util.poslast+1 - util.posfirst, "< util.poslast+1 - util.posfirst")
+    #print(util.poslast, "< poslast", len(util.sending_buffer)-1)
+
+    #while util.window_size <= util.poslast+1 - util.posfirst or len(to_elem) != 0: #inca mai sunt elemente de parcurs sau avem un element in timeout
+    while util.poslast <= len(util.sending_buffer)-1 or len(to_elem) != 0: #inca mai sunt elemente de parcurs sau avem un element in timeout
+       # print(to_elem, " ", util.posfirst, " " ,util.poslast)
+        if(util.shutdown_event.is_set()):
+            print("killing send")
+            break
         to_elem = []
         to_elem = timeout_fct()
 
         if len(to_elem) != 0:  #daca exista o bucata de fisier in timeout va fi retrimisa
             for i in range(0,len(to_elem)):
-                print(to_elem,"\n")
+                #print(to_elem,"\n")
                 util.window[to_elem[i]].sending_time = time.time()
                 mess = encoder.packing(util.FILE_CHUNK, to_elem[i], 0, util.window[to_elem[i]].data)
-                if(rand.randint(0,100)>util.client_pack_loss_percentage):
+                if(rand.randint(1,100)>util.packet_loss):
                     sock.sendto(mess, address)
+                    print(f"PACHETUL {to_elem[i]} S-A RETRIMIS(TIMED_OUT)")
                 else:
-                    print("TEAPA, NU S-O TRIMIS")
+                    print(f"!!!!!!!!!!!!!!PACHETUL {to_elem[i]} NU S-A RETRIMIS(PIERDUT)")
 
         slide_window()  #se muta fereastra daca este nevoie
 
@@ -141,12 +153,17 @@ def sw_send(sock, address: tuple[str, int]):
                 if util.window[i].sending_time == 0 and util.window[i].rcv_ack == False:
                     util.window[i].sending_time = time.time()
                     mess = encoder.packing(util.FILE_CHUNK, i, 0, util.window[i].data)
-                    if (rand.randint(0, 100) > util.client_pack_loss_percentage):
+                    if (rand.randint(1, 100) > util.packet_loss):
                         sock.sendto(mess, address)
+                        print(f"PACHETUL {i} S-A TRIMIS")
                     else:
-                        print("TEAPA, NU S-O TRIMIS")
+                        print(f"!!!!!!!!!!!!!!PACHETUL {i} S-A PIERDUT")
                # time.sleep(1)
                     #print("se trimite")
+        else:
+            to_elem = timeout_fct()
+            if len(to_elem) == 0:
+                break
         to_elem = []
         to_elem = timeout_fct()
     print("gata trimisul")
